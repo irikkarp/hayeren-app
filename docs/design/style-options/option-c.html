@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hayeren — вариант C «Ковёр»</title>
+<style>
+@font-face { font-family:'Noto Sans Armenian'; font-weight:400; font-display:swap;
+  src: local('Noto Sans Armenian'), url('../../../app/node_modules/@fontsource/noto-sans-armenian/files/noto-sans-armenian-armenian-400-normal.woff2') format('woff2'); }
+@font-face { font-family:'Noto Sans Armenian'; font-weight:700; font-display:swap;
+  src: local('Noto Sans Armenian Bold'), url('../../../app/node_modules/@fontsource/noto-sans-armenian/files/noto-sans-armenian-armenian-700-normal.woff2') format('woff2'); }
+
+:root {
+  color-scheme: light;
+  --field:#17306E; --field-2:#1F3F8C; --lattice:#2A4896;
+  --panel:#FFF6EA; --panel-2:#F6E3D0; --line:#D9B99A; --ink:#231A2E;
+  --text:#231A2E; --text-2:#5A4A5E; --on-field:#FFF6EA;
+  --garnet:#B0102E; --garnet-h:#8F0D26; --on-garnet:#FFFFFF; --garnet-soft:#F7D9D9;
+  --apricot:#F28C28; --on-apricot:#231A2E;
+  --blue-text:#17306E; --success:#1F6B3A; --success-soft:#D9F0DF;
+  --hdr:#9E1230; --focus:#FFC24A; --focus-in:#17306E; --eye:#FFF6EA; --wing:#F28C28;
+  --page:#EFE3D6;
+  --font-ui: system-ui,-apple-system,'Segoe UI',Roboto,Arial,'Noto Sans Armenian',sans-serif;
+  --font-hy: 'Noto Sans Armenian','Noto Sans',system-ui,sans-serif;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --field:#0B1230; --field-2:#111B45; --lattice:#18255A;
+  --panel:#1C2250; --panel-2:#141A40; --line:#3C4684; --ink:#F6EBDD;
+  --text:#F6EBDD; --text-2:#C9C3E0; --on-field:#F6EBDD;
+  --garnet:#FF7A8C; --garnet-h:#FF9AA8; --on-garnet:#2A0710; --garnet-soft:#3A1A32;
+  --apricot:#FFA94D; --on-apricot:#1A1020;
+  --blue-text:#A9C0FF; --success:#8FD39B; --success-soft:#1B2E1E;
+  --hdr:#5E0F22; --focus:#FFC24A; --focus-in:#0B1230; --eye:#1C2250; --wing:#FFA94D;
+  --page:#080C20;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--page); color:var(--text); font:400 16px/1.5 var(--font-ui); }
+h1,h2,h3,p { margin:0; }
+button { font:inherit; color:inherit; }
+:focus-visible { outline:3px solid var(--focus); outline-offset:2px; box-shadow:0 0 0 6px var(--focus-in); }
+.hy { font-family:var(--font-hy); line-height:1.35; }
+.muted { color:var(--text-2); }
+
+.page { max-width:1240px; margin:0 auto; padding:24px 16px 64px; }
+.page > header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.page h1 { font:800 30px/1.15 var(--font-ui); letter-spacing:.01em; }
+.page h2.sec { font:800 22px/1.3 var(--font-ui); margin:36px 0 12px; padding:4px 16px; display:inline-block; background:var(--field); color:var(--on-field); border-left:10px solid var(--apricot); border-right:10px solid var(--garnet); }
+:root[data-theme='dark'] .page h2.sec { border-left-color:var(--apricot); border-right-color:var(--garnet); }
+.theme-switch { min-height:44px; padding:0 18px; border-radius:0; border:3px double var(--garnet); background:var(--panel); font-weight:700; cursor:pointer; }
+.board { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+.card { background:var(--panel); border:3px double var(--line); padding:16px; }
+.card h3 { font:800 18px/1.3 var(--font-ui); margin-bottom:8px; }
+.swatches { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.sw { border:3px double var(--line); overflow:hidden; background:var(--panel); font-size:13px; line-height:1.35; }
+.sw i { display:block; height:56px; }
+.sw div { padding:8px 10px; }
+.sw b { display:block; font-size:14px; }
+.ic-grid { display:flex; flex-wrap:wrap; gap:12px; }
+.ic-grid figure { margin:0; width:92px; text-align:center; font-size:13px; }
+
+/* иллюстрации и восьмиугольные медальоны (гюль ковра) */
+.ic { width:42px; height:42px; display:block; flex:none; position:relative; }
+.ic .f1 { fill:var(--ic1); } .ic .f2 { fill:var(--ic2); }
+.ic .st, .ic .sw2 { fill:none; stroke:var(--ic2); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.oct { position:relative; width:60px; height:60px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:#F28C28; clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%); }
+.oct::before { content:''; position:absolute; inset:3px; background:var(--oc, #17306E);
+  clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%); }
+.o-ararat { --oc:#17306E; --ic1:#F28C28; --ic2:#FFF6EA; }
+.o-num { --oc:#B0102E; --ic1:#FFF6EA; --ic2:#B0102E; }
+.o-pom { --oc:#FFF6EA; --ic1:#B0102E; --ic2:#F28C28; }
+.o-taxi { --oc:#0F6B66; --ic1:#F28C28; --ic2:#FFF6EA; }
+.o-lavash { --oc:#17306E; --ic1:#F6C783; --ic2:#B0102E; }
+.o-jezve { --oc:#F28C28; --ic1:#9E1230; --ic2:#231A2E; }
+.o-house { --oc:#B0102E; --ic1:#F6C783; --ic2:#17306E; }
+.oct-lg { width:96px; height:96px; } .oct-lg .ic { width:68px; height:68px; }
+
+/* телефон: поле ковра */
+.phones { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; align-items:flex-start; }
+.phones figure { margin:0; }
+.phones figcaption { font:700 14px/1.4 var(--font-ui); text-align:center; margin-bottom:8px; }
+.phone { width:360px; min-height:760px; display:flex; flex-direction:column; background-color:var(--field); border:4px solid var(--garnet); outline:2px solid var(--apricot); outline-offset:-8px; border-radius:6px; overflow:hidden; position:relative; color:var(--on-field); }
+.lat { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.phone > *:not(.lat) { position:relative; }
+
+.hdr { background:var(--hdr); padding:14px 16px 10px; display:flex; flex-direction:column; gap:10px; color:#FFF6EA; }
+.hdr .row1 { display:flex; align-items:center; gap:12px; min-height:60px; }
+.hdr .logo { width:60px; height:60px; flex:none; background:#FFF6EA; padding:4px; color:#B0102E; --eye:#FFF6EA; --wing:#F28C28;
+  clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%); }
+.hdr .brand { font:800 28px/1.1 var(--font-ui); letter-spacing:.02em; }
+.hdr .brand-hy { font:700 18px/1.3 var(--font-hy); color:#FFD9A0; }
+.kil { display:block; width:100%; height:16px; }
+.screen { flex:1; padding:16px; display:flex; flex-direction:column; gap:16px; }
+.t-head { font:800 20px/1.3 var(--font-ui); display:flex; align-items:center; gap:10px; color:var(--on-field); letter-spacing:.02em; }
+.t-head::before, .t-head::after { content:''; flex:1; height:8px;
+  background:repeating-linear-gradient(90deg,#F28C28 0 8px,transparent 8px 12px); opacity:1; }
+.t-head::before { flex:0 0 28px; }
+
+.panel { background:var(--panel); color:var(--text); border:3px double var(--apricot); }
+.growth { display:flex; gap:12px; align-items:center; padding:10px 14px; }
+.growth b { font:800 18px/1.3 var(--font-ui); display:block; }
+.growth span { font-size:14px; line-height:1.35; color:var(--text-2); }
+.seeds { display:flex; gap:4px; margin-top:6px; }
+.seeds i { width:16px; height:16px; background:var(--garnet); transform:rotate(45deg) scale(.8); display:block; }
+.seeds i.off { background:none; border:2px solid var(--text-2); }
+
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:52px; padding:0 20px; border:0; border-radius:0; font-weight:800; font-size:17px; cursor:pointer; width:100%; text-align:center; letter-spacing:.01em;
+  clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,12px 100%,0 50%); }
+.btn-primary { background:var(--garnet); color:var(--on-garnet); }
+.btn-primary:hover { background:var(--garnet-h); }
+.btn-apricot { background:var(--apricot); color:var(--on-apricot); }
+.btn-text { background:none; color:var(--on-field); min-height:44px; text-decoration:underline; text-underline-offset:4px; clip-path:none; font-weight:700; }
+.btn small { display:block; font-weight:400; font-size:13px; }
+.repeat-lbl { display:flex; flex-direction:column; align-items:center; line-height:1.2; }
+.btn:focus-visible { clip-path:none; }
+
+.list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.row { display:flex; align-items:center; gap:12px; min-height:80px; padding:8px 14px 8px 10px; background:var(--panel); color:var(--text); border:3px double var(--apricot); text-decoration:none; }
+.row .grow { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.row .name { font-weight:800; font-size:16px; line-height:1.25; }
+.row .sub { font-size:14px; color:var(--text-2); }
+.progress { height:12px; background:var(--panel-2); border:2px solid var(--line); overflow:hidden; }
+.progress > span { display:block; height:100%; background:repeating-linear-gradient(90deg,var(--garnet) 0 10px,var(--panel) 10px 12px); }
+.chip-ok { display:inline-flex; gap:4px; align-items:center; padding:3px 10px; background:var(--success-soft); color:var(--success); border:2px solid var(--success); font-weight:800; font-size:13px; white-space:nowrap; }
+.chev { font-size:22px; font-weight:800; color:var(--garnet); }
+
+.tabbar { display:flex; background:var(--panel); color:var(--text-2); margin-top:auto; border-top:4px solid var(--garnet); }
+.tab { flex:1; min-height:62px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:13px; color:var(--text-2); text-decoration:none; }
+.tab svg { width:24px; height:24px; }
+.tab .hy-l { font:700 20px/24px var(--font-hy); }
+.tab[aria-current='page'] { color:var(--on-apricot); font-weight:800; background:var(--apricot); }
+
+.session-top { display:flex; align-items:center; gap:8px; min-height:56px; padding:0 8px; }
+.session-top .count { flex:1; text-align:center; font-size:14px; font-weight:700; }
+.icon-btn { min-width:44px; min-height:44px; border:3px double var(--apricot); background:var(--panel); color:var(--text); font-size:22px; font-weight:800; cursor:pointer; }
+.steps { display:flex; gap:4px; padding:0 16px; }
+.steps i { flex:1; height:14px; background:var(--panel-2); border:2px solid var(--line); display:block; }
+.steps i.on { background:var(--apricot); border-color:var(--apricot); }
+.word-card { position:relative; flex:1; min-height:380px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:28px 10px; background:var(--panel); color:var(--text); border:3px double var(--apricot); overflow:hidden; }
+.word-card .corner { position:absolute; width:34px; height:34px; color:var(--garnet); }
+.word-card .c1 { left:6px; top:6px; } .word-card .c2 { right:6px; top:6px; }
+.word-card .c3 { left:6px; bottom:6px; } .word-card .c4 { right:6px; bottom:6px; }
+.word-card > *:not(.corner) { position:relative; }
+.hy-hero { font:700 28px/1.3 var(--font-hy); color:var(--blue-text); white-space:nowrap; max-width:100%; }
+.translit { font-size:20px; font-weight:700; border-top:3px double var(--line); border-bottom:3px double var(--line); padding:2px 18px; }
+.sound { min-width:56px; min-height:56px; border:3px solid var(--garnet); background:var(--panel); color:var(--garnet); font-size:22px; cursor:pointer; clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%); }
+.hint { font-size:14px; color:var(--text-2); }
+.bar { display:flex; flex-direction:column; gap:8px; padding:12px 16px 16px; }
+
+.win { flex:1; display:flex; flex-direction:column; align-items:center; gap:12px; padding:24px 16px 16px; text-align:center; }
+.medal { position:relative; width:230px; height:230px; display:flex; align-items:center; justify-content:center; }
+.medal .rosette { position:absolute; inset:0; width:100%; height:100%; }
+.medal .bird { position:relative; width:118px; height:118px; color:#B0102E; --eye:#FFF6EA; --wing:#F28C28; }
+:root[data-theme='dark'] .medal .bird { color:#FF7A8C; }
+.win h2 { font:800 30px/1.15 var(--font-ui); letter-spacing:.01em; }
+.win p { color:var(--on-field); }
+.win-stats { display:flex; gap:10px; width:100%; }
+.win-stats .panel { flex:1; padding:8px; text-align:center; }
+.win-stats b { font:800 26px/1.1 var(--font-ui); display:block; color:var(--garnet); }
+.win-stats span { font-size:13px; color:var(--text-2); }
+.win .actions { width:100%; display:flex; flex-direction:column; gap:8px; margin-top:auto; }
+
+.band { height:40px; background:var(--hdr); overflow:hidden; }
+.band svg { width:100%; height:100%; display:block; }
+.bird-big { width:140px; height:140px; color:var(--garnet); --eye:var(--panel); --wing:#F28C28; }
+.alpha-head { display:flex; align-items:center; gap:12px; background:var(--field); color:var(--on-field); border:3px double var(--apricot); padding:10px 14px; }
+.alpha-head .bird { width:64px; height:64px; color:#FFC24A; --eye:#17306E; --wing:#FF7A8C; flex:none; }
+.alpha-head h3 { margin:0; font:800 24px/1.2 var(--font-ui); }
+@media (prefers-reduced-motion:no-preference) { .btn,.row { transition:background-color .15s; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- решётка поля ковра -->
+    <pattern id="lat" width="36" height="36" patternUnits="userSpaceOnUse">
+      <g fill="none" style="stroke:var(--lattice)" stroke-width="2">
+        <path d="M18 2L34 18L18 34L2 18Z"/>
+        <path d="M18 11L25 18L18 25L11 18Z"/>
+      </g>
+    </pattern>
+    <!-- килимная кайма: ромбы в ряд -->
+    <pattern id="kilim" width="32" height="16" patternUnits="userSpaceOnUse">
+      <rect width="32" height="16" fill="#B0102E"/>
+      <polygon points="16,0 28,8 16,16 4,8" fill="#F28C28"/>
+      <polygon points="16,4 23,8 16,12 9,8" fill="#FFF6EA"/>
+      <rect x="0" y="0" width="4" height="4" fill="#17306E"/><rect x="28" y="12" width="4" height="4" fill="#17306E"/>
+    </pattern>
+
+    <!-- розетка: восьмиконечная звезда с насечками, гюль -->
+    <symbol id="rosette" viewBox="0 0 200 200">
+      <g>
+        <polygon points="100,4 124,40 168,32 160,76 196,100 160,124 168,168 124,160 100,196 76,160 32,168 40,124 4,100 40,76 32,32 76,40" fill="#F28C28"/>
+        <polygon points="100,22 118,50 152,46 148,82 176,100 148,118 152,154 118,150 100,178 82,150 48,154 52,118 24,100 52,82 48,46 82,50" fill="#B0102E"/>
+        <circle cx="100" cy="100" r="62" fill="#FFF6EA"/>
+        <circle cx="100" cy="100" r="62" fill="none" stroke="#17306E" stroke-width="4" stroke-dasharray="10 6"/>
+      </g>
+    </symbol>
+
+    <!-- уголок рамки: ступенчатый -->
+    <symbol id="corner" viewBox="0 0 34 34">
+      <path d="M2 2H32V8H8V32H2Z" fill="currentColor"/>
+      <rect x="12" y="12" width="8" height="8" fill="#F28C28"/>
+    </symbol>
+
+    <!-- Птицепись C: угловая, «килимная» птица-Ա из прямых отрезков -->
+    <symbol id="bird-c" viewBox="0 0 100 100">
+      <g fill="none" stroke="currentColor" stroke-linejoin="miter" stroke-linecap="butt">
+        <path stroke-width="11" d="M28 36V74H72V26"/>
+        <path stroke-width="6" d="M72 26L57 6M72 26V2M72 26L87 6"/>
+        <path stroke-width="6" d="M72 70L88 82L82 94"/>
+      </g>
+      <polygon points="38,60 50,46 62,60 50,70" style="fill:var(--wing)"/>
+      <polygon points="16,12 42,12 42,38 16,38" fill="currentColor"/>
+      <polygon points="17,20 2,26 17,33" fill="currentColor"/>
+      <rect x="30" y="18" width="6" height="6" style="fill:var(--eye)"/>
+      <rect x="52" y="0" width="8" height="8" fill="currentColor"/><rect x="68" y="-2" width="8" height="8" fill="currentColor" transform="translate(0 0)"/><rect x="84" y="2" width="8" height="8" fill="currentColor"/>
+    </symbol>
+
+    <!-- гранат: семечки-дни -->
+    <symbol id="pom-seeds" viewBox="0 0 60 60">
+      <polygon points="22,12 25,4 30,9 35,4 38,12" fill="#F28C28"/>
+      <circle cx="30" cy="34" r="22" fill="#B0102E"/>
+      <circle cx="30" cy="34" r="22" fill="none" stroke="#FFC24A" stroke-width="2"/>
+      <g fill="#FFD9A0">
+        <rect x="22" y="26" width="6" height="6" transform="rotate(45 25 29)"/>
+        <rect x="32" y="26" width="6" height="6" transform="rotate(45 35 29)"/>
+        <rect x="27" y="36" width="6" height="6" transform="rotate(45 30 39)"/>
+      </g>
+      <g fill="none" stroke="#FFD9A0" stroke-width="2" stroke-dasharray="3 3"><rect x="37" y="38" width="6" height="6" transform="rotate(45 40 41)"/><rect x="17" y="38" width="6" height="6" transform="rotate(45 20 41)"/></g>
+    </symbol>
+
+    <symbol id="i-ararat" viewBox="0 0 32 32">
+      <path class="f1" d="M1 27L11 6L18 20L24 12L31 27Z"/>
+      <path class="f2" d="M11 6L7.5 13L10 12L11.5 14.5L13.8 11.6Z"/>
+      <path class="f2" d="M24 12L21.5 16L24 15.2L26 16.5Z"/>
+    </symbol>
+    <symbol id="i-pom" viewBox="0 0 32 32">
+      <path class="f2" d="M9 10L10 5L14 8L16 4L18 8L22 5L23 10Z"/>
+      <circle class="f1" cx="16" cy="19" r="10.5"/>
+      <path class="sw2" d="M9.5 18Q10.5 13 14.5 12.2" style="stroke:#FFF6EA"/>
+    </symbol>
+    <symbol id="i-lavash" viewBox="0 0 32 32">
+      <path class="f1" d="M2 11Q16 4 30 11L28 24Q16 30 4 24Z"/>
+      <path class="sw2" d="M8 14Q16 11 24 14M8 19Q16 16 24 19"/>
+    </symbol>
+    <symbol id="i-taxi" viewBox="0 0 32 32">
+      <rect class="f2" x="12" y="5" width="8" height="5" rx="1.2"/>
+      <path class="f1" d="M3 22L5.5 14Q6.5 11 9.5 11H22.5Q25.5 11 26.5 14L29 22V25H3Z"/>
+      <path class="sw2" d="M9 14H23" style="stroke:#0F6B66"/>
+      <circle class="f2" cx="9" cy="25" r="3.2"/><circle class="f2" cx="23" cy="25" r="3.2"/>
+    </symbol>
+    <symbol id="i-jezve" viewBox="0 0 32 32">
+      <path class="f1" d="M9 27L12 13H20L23 27Z"/>
+      <path class="f1" d="M13 13L14 6H18L19 13Z"/>
+      <path class="f1" d="M13 6L10 3L15 4Z"/>
+      <path class="st" d="M23 15Q30 16 27 25"/>
+    </symbol>
+    <symbol id="i-house" viewBox="0 0 32 32">
+      <path class="f1" d="M4 16L16 5L28 16V27H4Z"/>
+      <rect class="f2" x="13" y="19" width="6" height="8" rx="3"/>
+    </symbol>
+    <symbol id="i-num" viewBox="0 0 32 32">
+      <rect class="f1" x="3" y="5" width="26" height="22" rx="3" style="opacity:.0"/>
+      <path class="sw2" d="M9 11L11.5 9V23M16 12Q16 9 19 9Q22 9 22 12Q22 15 16 23H24" style="stroke:#FFF6EA;stroke-width:2.2"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page">
+<header>
+  <div>
+    <h1>Вариант C «Ковёр»</h1>
+    <p class="muted">Глубокий синий Арарат как поле ковра, гранатовые и абрикосовые медальоны, ступенчатые рамки. Настроение: насыщенное, праздничное, «армянский ковёр».</p>
+  </div>
+  <button class="theme-switch" type="button" id="ts">Тёмная тема</button>
+</header>
+
+<h2 class="sec">Мини-мудборд</h2>
+<div class="swatches" aria-label="Палитра">
+  <div class="sw"><i style="background:#17306E"></i><div><b>Арарат (поле)</b>#17306E<br>фон экранов, текст на нём 11:1</div></div>
+  <div class="sw"><i style="background:#FFF6EA"></i><div><b>Лаваш (панель)</b>#FFF6EA<br>панели, карточки</div></div>
+  <div class="sw"><i style="background:#B0102E"></i><div><b>Гранат</b>#B0102E<br>кнопки, белый текст 7:1</div></div>
+  <div class="sw"><i style="background:#F28C28"></i><div><b>Абрикос</b>#F28C28<br>рамки, активная вкладка, тёмный текст 7:1</div></div>
+  <div class="sw"><i style="background:#9E1230"></i><div><b>Шапка-килим</b>#9E1230<br>шапка и кромки</div></div>
+  <div class="sw"><i style="background:#0F6B66"></i><div><b>Бирюза</b>#0F6B66<br>акцент иллюстраций</div></div>
+  <div class="sw"><i style="background:#231A2E"></i><div><b>Чернила</b>#231A2E<br>текст на панели, 15:1</div></div>
+  <div class="sw"><i style="background:#0B1230"></i><div><b>Тёмная: ночное поле</b>#0B1230<br>панель #1C2250, гранат #FF7A8C, абрикос #FFA94D</div></div>
+</div>
+
+<div class="board" style="margin-top:16px">
+  <div class="card">
+    <h3>Шрифты</h3>
+    <div class="hy" lang="hy" style="font-size:44px;font-weight:700;line-height:1.25;color:var(--blue-text)">Հայերեն</div>
+    <div style="font:800 22px/1.3 var(--font-ui)">Заголовки: системный sans, 800</div>
+    <p class="muted" style="margin-top:6px">Армянский: Noto Sans Armenian Bold. Слово в карточке 28 px, в одну строку, на светлой панели для максимального контраста.</p>
+  </div>
+  <div class="card">
+    <h3>Орнамент: килимная кайма и гюль</h3>
+    <div class="band"><svg aria-hidden="true"><rect y="12" width="100%" height="16" fill="url(#kilim)"/></svg></div>
+    <div style="display:flex;gap:16px;align-items:center;margin-top:10px">
+      <svg width="64" height="64" viewBox="0 0 200 200" aria-hidden="true"><use href="#rosette"/></svg>
+      <svg width="40" height="40" viewBox="0 0 34 34" aria-hidden="true" style="color:var(--garnet)"><use href="#corner"/></svg>
+      <span class="muted" style="font-size:14px">Кайма шапки, уголки карточки, медальон праздника</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Птицепись: Ա</h3>
+    <div style="display:flex;gap:16px;align-items:center">
+      <svg class="bird-big" viewBox="-4 -6 108 106" aria-label="Буква Ա в виде птицы"><use href="#bird-c" width="100" height="100"/></svg>
+      <p class="muted" style="font-size:14px">Угловая «килимная» птица: квадратная голова, ступенчатая чаша-тело, крыло-ромб, хвост-веер.</p>
+    </div>
+    <div class="alpha-head" style="margin-top:10px">
+      <svg class="bird" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-c" width="100" height="100"/></svg>
+      <div><h3>Алфавит</h3><span style="font-size:14px">38 букв</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Иллюстрации тем</h3>
+    <div class="ic-grid">
+      <figure><span class="oct o-ararat" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-ararat"/></svg></span>Приветствия</figure>
+      <figure><span class="oct o-pom" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-pom"/></svg></span>Гранат</figure>
+      <figure><span class="oct o-lavash" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-lavash"/></svg></span>Лаваш</figure>
+      <figure><span class="oct o-taxi" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-taxi"/></svg></span>Такси</figure>
+      <figure><span class="oct o-jezve" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-jezve"/></svg></span>Кафе</figure>
+      <figure><span class="oct o-house" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-house"/></svg></span>Жильё</figure>
+      <figure><span class="oct o-num" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-num"/></svg></span>Числа</figure>
+    </div>
+  </div>
+</div>
+
+<h2 class="sec">Экраны</h2>
+<div class="phones">
+
+<figure>
+<figcaption>Главная</figcaption>
+<div class="phone">
+  <svg class="lat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#lat)"/></svg>
+  <div class="hdr">
+    <div class="row1">
+      <svg class="logo" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-c" width="100" height="100"/></svg>
+      <div><div class="brand">Hayeren</div><div class="brand-hy" lang="hy">Հայերեն</div></div>
+    </div>
+    <svg class="kil" aria-hidden="true"><rect width="100%" height="16" fill="url(#kilim)"/></svg>
+  </div>
+  <div class="screen">
+    <div class="panel growth" role="group" aria-label="Серия дней: 3 дня подряд, 3 зерна граната из 5">
+      <svg width="64" height="64" viewBox="0 0 60 60" aria-hidden="true"><use href="#pom-seeds"/></svg>
+      <div><b>3 дня подряд</b><span>Гранат наливается: ещё 2 дня до спелого</span>
+        <div class="seeds" aria-hidden="true"><i></i><i></i><i></i><i class="off"></i><i class="off"></i></div></div>
+    </div>
+
+    <button class="btn btn-primary" type="button">
+      <span class="repeat-lbl">Повторить (7)<small>освежить слова из всех тем</small></span>
+    </button>
+
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="oct o-ararat"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-ararat"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="sub">выучено 6 из 15</span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="6" aria-label="Выучено 6 из 15"><span style="width:40%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="oct o-num"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-num"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="sub">выучено 4 из 15</span><span class="progress"><span style="width:27%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="oct o-pom"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-pom"/></svg></span><span class="grow"><span class="name">Магазин и рынок</span><span class="sub">выучено 0 из 14</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="oct o-taxi"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-taxi"/></svg></span><span class="grow"><span class="name">Транспорт и такси</span><span class="sub">выучено 12 из 12</span></span><span class="chip-ok">✓ Выучена</span></a></li>
+    </ul>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#"><span class="hy-l hy" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<figure>
+<figcaption>Карточка слова (лицевая сторона)</figcaption>
+<div class="phone">
+  <svg class="lat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#lat)"/></svg>
+  <div class="session-top">
+    <button class="icon-btn" type="button" aria-label="Закрыть сессию">×</button>
+    <span class="count">Слово 3 из 10</span>
+    <span style="min-width:44px"></span>
+  </div>
+  <div class="steps" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="3" aria-label="Слово 3 из 10">
+    <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+  <div class="screen">
+    <div class="word-card">
+      <svg class="corner c1" viewBox="0 0 34 34" aria-hidden="true"><use href="#corner"/></svg>
+      <svg class="corner c2" viewBox="0 0 34 34" aria-hidden="true" style="transform:scaleX(-1)"><use href="#corner"/></svg>
+      <svg class="corner c3" viewBox="0 0 34 34" aria-hidden="true" style="transform:scaleY(-1)"><use href="#corner"/></svg>
+      <svg class="corner c4" viewBox="0 0 34 34" aria-hidden="true" style="transform:scale(-1,-1)"><use href="#corner"/></svg>
+      <div class="hy-hero" lang="hy">շնորհակալություն</div>
+      <div class="translit">shnorhakalut’yun</div>
+      <button class="sound" type="button" aria-label="Прослушать слово">♪</button>
+      <p class="hint">Вспомни перевод, затем проверь себя</p>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="btn btn-apricot" type="button">Показать перевод</button>
+    <button class="btn btn-text" type="button">Пропустить</button>
+  </div>
+</div>
+</figure>
+
+<figure>
+<figcaption>Тема выучена</figcaption>
+<div class="phone">
+  <svg class="lat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#lat)"/></svg>
+  <svg class="kil" aria-hidden="true" style="margin-top:20px"><rect width="100%" height="16" fill="url(#kilim)"/></svg>
+  <div class="win" style="padding-top:12px">
+    <div class="medal">
+      <svg class="rosette" viewBox="0 0 200 200" aria-hidden="true"><use href="#rosette"/></svg>
+      <svg class="bird" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-c" width="100" height="100"/></svg>
+    </div>
+    <h2>Тема выучена!</h2>
+    <p>Транспорт и такси: все 12 слов. <span class="hy" lang="hy" style="font-weight:700;color:#FFD9A0">Շատ լավ!</span></p>
+    <div class="win-stats">
+      <div class="panel"><b>+12</b><span>слов выучено</span></div>
+      <div class="panel"><b>24</b><span>из 101 всего</span></div>
+      <div class="panel"><b>4</b><span>дня подряд</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" type="button">Следующая тема: Кафе и еда</button>
+      <button class="btn btn-text" type="button">На главную</button>
+    </div>
+  </div>
+  <svg class="kil" aria-hidden="true"><rect width="100%" height="16" fill="url(#kilim)"/></svg>
+</div>
+</figure>
+
+</div>
+</div>
+<script>
+(function(){
+  var r=document.documentElement, b=document.getElementById('ts');
+  if(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches){r.dataset.theme='dark';}
+  function sync(){b.textContent=r.dataset.theme==='dark'?'Светлая тема':'Тёмная тема';}
+  b.addEventListener('click',function(){r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';sync();});
+  sync();
+})();
+</script>
+</body>
+</html>

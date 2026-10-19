@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hayeren — прототипы экранов MVP (стиль A «Рукопись»)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="theme-switch" type="button" id="theme">Тема: авто</button>
+
+<!-- Определения: аревахач, птицепись, хачкар, гранат, значки тем. Все цвета через переменные, чтобы работала тёмная тема. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="arev" width="28" height="28" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#E0B95A" stroke-width="1.2">
+        <rect x="8" y="8" width="12" height="12"/>
+        <rect x="8" y="8" width="12" height="12" transform="rotate(45 14 14)"/>
+        <circle cx="14" cy="14" r="2.5"/>
+      </g>
+    </pattern>
+
+    <!-- Птицепись: Ա как птица. Левая «рука» буквы: шея, голова с клювом. Чаша: тело. Правая «рука»: хвост-веер. Хвостик буквы: лапка. -->
+    <symbol id="bird-a" viewBox="-4 -6 108 106">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke-width="8" d="M30 34V58Q30 84 52 84Q74 84 74 58V26"/>
+        <path stroke-width="5" d="M74 26L63 8M74 26L75 4M74 26L87 9"/>
+        <path stroke-width="4" d="M74 60Q80 80 95 83M95 83L91 92"/>
+        <path stroke-width="3" d="M42 66Q52 52 62 66M45 72Q52 62 59 72"/>
+        <path stroke-width="3" d="M30 13Q27 4 36 4M36 13Q39 5 47 8"/>
+      </g>
+      <circle cx="30" cy="25" r="11.5" fill="currentColor"/>
+      <path d="M20 21L4 27L20 32Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="33" cy="22" r="2.8" style="fill:var(--eye)"/>
+      <circle cx="63" cy="8" r="3" fill="currentColor"/><circle cx="75" cy="4" r="3" fill="currentColor"/><circle cx="87" cy="9" r="3" fill="currentColor"/>
+      <circle cx="52" cy="84" r="2.6" style="fill:var(--eye)"/>
+    </symbol>
+
+    <!-- Хачкар-крест с трилистными концами -->
+    <symbol id="khach" viewBox="0 0 40 40">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 8V32M8 20H32"/>
+        <path d="M20 8Q15 8 15 4M20 8Q25 8 25 4M20 32Q15 32 15 36M20 32Q25 32 25 36M8 20Q8 15 4 15M8 20Q8 25 4 25M32 20Q32 15 36 15M32 20Q32 25 36 25"/>
+        <path d="M20 14L26 20L20 26L14 20Z"/>
+      </g>
+    </symbol>
+
+    <!-- Гранат (серия дней) -->
+    <symbol id="pom" viewBox="0 0 40 40">
+      <path d="M9 14L11 6L16 11L20 4L24 11L29 6L31 14Z" style="fill:var(--crown);stroke:var(--pom-ink);stroke-width:1.2;stroke-linejoin:round"/>
+      <circle cx="20" cy="24" r="14" style="fill:var(--pom-fill);stroke:var(--pom-ink);stroke-width:1.2"/>
+      <path d="M11 22Q12 15 18 14" fill="none" stroke="#F1A5B0" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Значки тем 32x32 (классы f1, f2, st, sw2, dot описаны в style.css без предков) -->
+    <symbol id="i-greetings" viewBox="0 0 32 32">
+      <path class="f1" d="M1 27L11 6L18 20L24 12L31 27Z"/>
+      <path class="f2" d="M11 6L7.5 13L10 12L11.5 14.5L13.8 11.6Z"/>
+      <path class="f2" d="M24 12L21.5 16L24 15.2L26 16.5Z"/>
+      <path class="st" d="M0 29H32"/>
+    </symbol>
+    <!-- Числа: счёты -->
+    <symbol id="i-numbers" viewBox="0 0 32 32">
+      <rect class="f2" x="3" y="5" width="26" height="22" rx="3"/>
+      <path class="st" d="M6 11H26M6 16H26M6 21H26"/>
+      <circle class="f1" cx="9" cy="11" r="2.1"/><circle class="f1" cx="13.6" cy="11" r="2.1"/><circle class="f1" cx="23" cy="11" r="2.1"/>
+      <circle class="f1" cx="9" cy="16" r="2.1"/><circle class="f1" cx="19" cy="16" r="2.1"/><circle class="f1" cx="23.4" cy="16" r="2.1"/>
+      <circle class="f1" cx="9" cy="21" r="2.1"/><circle class="f1" cx="13.6" cy="21" r="2.1"/><circle class="f1" cx="18.2" cy="21" r="2.1"/>
+    </symbol>
+    <!-- Магазин и рынок: корзина с плодами -->
+    <symbol id="i-shop" viewBox="0 0 32 32">
+      <path class="st" style="stroke-width:2" d="M9.5 14Q9.5 4.5 16 4.5Q22.5 4.5 22.5 14"/>
+      <circle class="f2" cx="12.5" cy="12.5" r="3.6"/>
+      <circle class="f2" cx="19.5" cy="12" r="3.6"/>
+      <path class="f1" d="M4 14H28L25 26.5Q16 28.5 7 26.5Z"/>
+      <path class="sw2" d="M5.5 19H26.5M6.5 23H25.5M11 15.5L12 26.5M16 15.5V27.5M21 15.5L20 26.5"/>
+    </symbol>
+    <symbol id="i-transport" viewBox="0 0 32 32">
+      <rect class="f2" x="12" y="5" width="8" height="5" rx="1.2"/>
+      <path class="f1" d="M3 22L5.5 14Q6.5 11 9.5 11H22.5Q25.5 11 26.5 14L29 22V25H3Z"/>
+      <path class="sw2" d="M9 14H23"/>
+      <circle class="f2" cx="9" cy="25" r="3.2"/><circle class="f2" cx="23" cy="25" r="3.2"/>
+    </symbol>
+    <symbol id="i-housing" viewBox="0 0 32 32">
+      <path class="f1" d="M4 16L16 5L28 16V27H4Z"/>
+      <rect class="f2" x="13" y="19" width="6" height="8" rx="3"/>
+      <path class="st" d="M2 16L16 4L30 16"/>
+    </symbol>
+    <!-- Кафе и еда: лаваш, тонкий лист с загнутым углом -->
+    <symbol id="i-food" viewBox="0 0 32 32">
+      <path class="f1" d="M3 10Q13 5.5 22 8L29 14.5Q29.8 20 27.5 24Q15 28.5 4.5 24.5Q2 17 3 10Z"/>
+      <path class="f2" d="M22 8L29 14.5Q25 15.5 21 14Q21.5 10.5 22 8Z"/>
+      <path class="st" d="M7 17Q12 14.8 17 16.5"/>
+      <circle class="dot" cx="9" cy="21" r="1"/><circle class="dot" cx="13.5" cy="20" r="0.9"/><circle class="dot" cx="19" cy="21.5" r="1"/><circle class="dot" cx="24" cy="21" r="0.9"/><circle class="dot" cx="10.5" cy="12.5" r="0.9"/>
+    </symbol>
+  </defs>
+</svg>
+
+<main class="gallery">
+
+<!-- S01 Онбординг -->
+<figure>
+<figcaption>S01 Онбординг (критерии 1–5): птицепись-буквица</figcaption>
+<div class="phone is-tall">
+  <div class="onb-hero">
+    <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
+    <svg class="bird" aria-hidden="true"><use href="#bird-a"/></svg>
+    <h1 class="t-display">Hayeren</h1>
+    <p class="hy hy-body" lang="hy" aria-hidden="true">Հայերեն</p>
+    <p class="t-small">Армянские слова за 5–10 минут в день</p>
+  </div>
+  <div class="screen" style="gap:20px">
+    <h2 class="t-heading">Как вы хотите заниматься?</h2>
+    <div style="display:flex; flex-direction:column; gap:12px">
+      <button class="choice" type="button">
+        <span class="t-heading">Учу армянский с нуля</span>
+        <span class="muted t-small">Под каждым словом будет транслитерация латиницей</span>
+        <span class="hy hy-body" lang="hy">բարև <span class="translit-sm">· barev</span></span>
+      </button>
+      <button class="choice" type="button">
+        <span class="t-heading">Понимаю на слух, хочу научиться читать</span>
+        <span class="muted t-small">Транслитерация скрыта, её можно подсмотреть по кнопке</span>
+        <span class="hy hy-body" lang="hy">բարև <span class="translit-sm">· ?</span></span>
+      </button>
+    </div>
+    <p class="muted t-small" style="text-align:center">Режим можно поменять в настройках</p>
+  </div>
+</div>
+</figure>
+
+<!-- S02 Главная, N = 7 -->
+<figure>
+<figcaption>S02 Главная: «Повторить (7)», серия 3 дня (критерии 6–8, 23–26, 38, 39, 110–112)</figcaption>
+<div class="phone is-tall">
+  <div class="hdr">
+    <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
+    <svg class="logo" aria-hidden="true"><use href="#bird-a"/></svg>
+    <div><h1 class="brand">Hayeren</h1><div class="brand-hy" lang="hy">Հայերեն</div></div>
+  </div>
+  <div class="screen">
+    <div class="growth" role="group" aria-label="Серия: 3 дня подряд. Гранат растёт, до спелого 2 дня">
+      <div class="trees" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="22" height="22" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="28" height="28" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="26" height="26" viewBox="0 0 40 40" style="color:var(--color-border-strong)"><circle cx="20" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg>
+        <svg width="26" height="26" viewBox="0 0 40 40" style="color:var(--color-border-strong)"><circle cx="20" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg>
+      </div>
+      <div><b>3 дня подряд</b><span class="sub">Гранат растёт: до спелого 2 дня</span></div>
+    </div>
+    <div class="stats" role="group" aria-label="Ваш прогресс">
+      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">26</span><span class="sub">из 88</span></div>
+      <div class="surface stat"><span class="label">Повторить сегодня</span><span class="t-stat">7</span><span class="sub">слов</span></div>
+    </div>
+
+    <div>
+      <button class="btn btn-primary btn-block" type="button">Повторить (7)</button>
+    </div>
+
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="muted t-small">выучено 6 из 15</span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="6" aria-label="Приветствия и вежливость: выучено 6 из 15"><span style="width:40%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-numbers"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="muted t-small">выучено 4 из 15</span><span class="progress"><span style="width:27%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-shop" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-shop"/></svg></span><span class="grow"><span class="name">Магазин и рынок</span><span class="muted t-small">выучено 0 из 15</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-transport" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-transport"/></svg></span><span class="grow"><span class="name">Транспорт и такси</span><span class="muted t-small">выучено 14 из 14</span><span class="progress"><span style="width:100%"></span></span></span><span class="chip chip-ok">✓ Выучена</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-housing" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-housing"/></svg></span><span class="grow"><span class="name">Жильё</span><span class="muted t-small">выучено 2 из 15</span><span class="progress"><span style="width:13%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-food" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-food"/></svg></span><span class="grow"><span class="name">Кафе и еда</span><span class="muted t-small">выучено 0 из 14</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+    </ul>
+
+    <div class="section-head" style="margin-top:8px">
+      <h2 class="t-head" style="flex:1">Мои наборы</h2>
+      <button class="btn btn-text" type="button">+ Добавить слова</button>
+    </div>
+    <ul class="list">
+      <li class="row" style="cursor:default">
+        <a href="#" class="grow" style="text-decoration:none; color:inherit"><span class="name">Урок 5</span><span class="muted t-small">выучено 2 из 13</span><span class="progress"><span style="width:15%"></span></span></a>
+        <button class="btn btn-secondary btn-sm" type="button">Учить</button>
+      </li>
+    </ul>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#"><span class="hy-l" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<!-- S02 Главная, N = 0, первый запуск -->
+<figure>
+<figcaption>S02 Главная, первый запуск: N = 0, серия 0, нет наборов (критерии 7, 38, 113)</figcaption>
+<div class="phone is-tall">
+  <div class="hdr">
+    <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
+    <svg class="logo" aria-hidden="true"><use href="#bird-a"/></svg>
+    <div><h1 class="brand">Hayeren</h1><div class="brand-hy" lang="hy">Հայերեն</div></div>
+  </div>
+  <div class="screen">
+    <div class="growth is-empty" role="group" aria-label="Серия: 0 дней. Начните серию сегодня">
+      <div class="trees" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 40 40" style="color:var(--color-border-strong)"><circle cx="20" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg>
+      </div>
+      <div><b>Начните серию</b><span class="sub">Ответьте на любую карточку, и вырастет первый гранат</span></div>
+    </div>
+    <div class="stats" role="group" aria-label="Ваш прогресс">
+      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">0</span><span class="sub">из 88</span></div>
+      <div class="surface stat"><span class="label">Повторить сегодня</span><span class="t-stat">0</span><span class="sub">слов</span></div>
+    </div>
+
+    <div>
+      <button class="btn btn-primary btn-block" type="button" disabled aria-describedby="rep-note-0">Повторить (0)</button>
+      <p class="repeat-note" id="rep-note-0">Пока нечего повторять: начните с любой темы</p>
+    </div>
+
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="muted t-small">выучено 0 из 15</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-numbers"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="muted t-small">выучено 0 из 15</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+    </ul>
+
+    <div class="section-head" style="margin-top:8px">
+      <h2 class="t-head" style="flex:1">Мои наборы</h2>
+    </div>
+    <div class="empty">
+      <svg class="khach" width="40" height="40" aria-hidden="true"><use href="#khach"/></svg>
+      <p>Добавьте слова, которые дал учитель</p>
+      <button class="btn btn-primary btn-block" type="button">Добавить слова</button>
+    </div>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#"><span class="hy-l" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<!-- S02 Кнопка «Повторить»: все состояния -->
+<figure>
+<figcaption>S02 Кнопка «Повторить (N)»: четыре состояния (критерии 110, 113, 114)</figcaption>
+<div class="phone is-tall" style="min-height:0">
+  <div class="screen" style="gap:28px">
+    <div>
+      <p class="t-caption muted" style="margin-bottom:6px">N = 7 (обычное)</p>
+      <button class="btn btn-primary btn-block" type="button">Повторить (7)</button>
+    </div>
+    <div>
+      <p class="t-caption muted" style="margin-bottom:6px">N = 45 (больше 30: подпись)</p>
+      <button class="btn btn-primary btn-block" type="button" aria-describedby="rep-note-45">Повторить (45)</button>
+      <p class="repeat-note" id="rep-note-45">В сессии 30 слов, остальные — в следующей</p>
+    </div>
+    <div>
+      <p class="t-caption muted" style="margin-bottom:6px">N = 0, ещё не было ни одного слова с прогрессом</p>
+      <button class="btn btn-primary btn-block" type="button" disabled aria-describedby="rep-note-a">Повторить (0)</button>
+      <p class="repeat-note" id="rep-note-a">Пока нечего повторять: начните с любой темы</p>
+    </div>
+    <div>
+      <p class="t-caption muted" style="margin-bottom:6px">N = 0, всё уже повторено</p>
+      <button class="btn btn-primary btn-block" type="button" disabled aria-describedby="rep-note-b">Повторить (0)</button>
+      <p class="repeat-note" id="rep-note-b">На сегодня всё повторено</p>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- S03a Карточка, лицевая, beginner -->
+<figure>
+<figcaption>S03a Карточка, лицевая сторона, режим «с нуля» (критерии 9, 11, 12)</figcaption>
+<div class="phone">
+  <div class="session-top">
+    <button class="icon-btn" type="button">Завершить</button>
+    <span class="count">Осталось: 9</span>
+    <span style="min-width:44px"></span>
+  </div>
+  <div class="screen">
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="3" aria-label="Пройдено 3 из 12"><span style="width:25%"></span></div>
+    <div class="word-card">
+      <span class="chip chip-info">Новое слово</span>
+      <p class="hy hy-hero is-xlong" lang="hy">շնորհակալություն</p>
+      <p class="translit">shnorhakalut'yun</p>
+    </div>
+  </div>
+  <div class="stickybar is-session">
+    <button class="btn btn-primary btn-block" type="button">Показать ответ</button>
+  </div>
+</div>
+</figure>
+
+<!-- S03b Карточка, лицевая, reader -->
+<figure>
+<figcaption>S03b Карточка, лицевая сторона, режим «чтение»: транслитерация скрыта (критерий 9)</figcaption>
+<div class="phone">
+  <div class="session-top">
+    <button class="icon-btn" type="button">Завершить</button>
+    <span class="count">Осталось: 9</span>
+    <span style="min-width:44px"></span>
+  </div>
+  <div class="screen">
+    <div class="progress"><span style="width:25%"></span></div>
+    <div class="word-card">
+      <span class="chip">Повторение</span>
+      <p class="hy hy-hero" lang="hy">բարև</p>
+      <button class="btn btn-secondary btn-sm" type="button" aria-expanded="false">Подсказка</button>
+    </div>
+  </div>
+  <div class="stickybar is-session">
+    <button class="btn btn-primary btn-block" type="button">Показать ответ</button>
+  </div>
+</div>
+</figure>
+
+<!-- S03c Карточка, обратная -->
+<figure>
+<figcaption>S03c Карточка, обратная сторона (критерии 10, 11, 87)</figcaption>
+<div class="phone">
+  <div class="session-top">
+    <button class="icon-btn" type="button">Завершить</button>
+    <span class="count">Осталось: 9</span>
+    <span style="min-width:44px"></span>
+  </div>
+  <div class="screen">
+    <div class="progress"><span style="width:25%"></span></div>
+    <div class="word-card" style="gap:10px">
+      <span class="chip">Повторение</span>
+      <p class="hy hy-hero is-xlong" lang="hy">շնորհակալություն</p>
+      <p class="translit">shnorhakalut'yun</p>
+      <svg class="rule" aria-hidden="true"><use href="#khach"/></svg>
+      <p class="ru">спасибо</p>
+      <div class="example">
+        <span class="cap">Пример</span>
+        <span class="hy hy-body" lang="hy">Շատ շնորհակալություն։</span>
+        <span class="muted">Большое спасибо.</span>
+      </div>
+    </div>
+  </div>
+  <div class="stickybar is-session">
+    <div class="btn-row">
+      <button class="btn btn-answer-no" type="button">↺ Не знаю</button>
+      <button class="btn btn-success" type="button">✓ Знаю</button>
+    </div>
+  </div>
+  <div class="toast" role="status">Знаю · вернёмся к слову через 4 дня</div>
+</div>
+</figure>
+
+<!-- S04 Итог общей сессии -->
+<figure>
+<figcaption>S04 Итог общей сессии: «Повторить ещё (15)» и «На главную» (критерии 21, 118, 119)</figcaption>
+<div class="phone">
+  <div class="summary">
+    <svg class="khach is-primary" width="48" height="48" aria-hidden="true"><use href="#khach"/></svg>
+    <h1 class="t-title">Хорошая работа!</h1>
+    <div class="tiles" role="group" aria-label="Итог сессии">
+      <div class="surface tile-n"><b>30</b><span>Пройдено</span></div>
+      <div class="surface tile-n"><b>24</b><span>Знаю</span></div>
+      <div class="surface tile-n"><b>6</b><span>Не знаю</span></div>
+    </div>
+    <p>Серия растёт: 4 дня подряд</p>
+    <p class="muted">Осталось повторить: 15</p>
+    <div class="actions">
+      <button class="btn btn-primary btn-block" type="button">Повторить ещё (15)</button>
+      <button class="btn btn-secondary btn-block" type="button">На главную</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- Тема выучена -->
+<figure>
+<figcaption>S04b «Тема выучена»: итог сессии по теме, когда в ней выучено последнее слово (кр. 8, 21; входит в MVP, решено 2026-10-19)</figcaption>
+<div class="phone win">
+  <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
+  <div class="summary">
+    <svg class="bird" aria-hidden="true"><use href="#bird-a"/></svg>
+    <h1 class="t-title">Тема выучена!</h1>
+    <p class="muted">Транспорт и такси: выучено 14 из 14</p>
+    <div>
+      <p class="hy hy-body" lang="hy">Շատ լավ</p>
+      <p class="translit-sm">shat lav · очень хорошо</p>
+    </div>
+    <div class="grown" aria-hidden="true">
+      <svg width="40" height="40" viewBox="0 0 40 40"><use href="#pom"/></svg>
+      <svg width="56" height="56" viewBox="0 0 40 40"><use href="#pom"/></svg>
+      <svg width="72" height="72" viewBox="0 0 40 40"><use href="#pom"/></svg>
+    </div>
+    <div class="tiles" role="group" aria-label="Итог сессии">
+      <div class="surface tile-n"><b>14</b><span>Пройдено</span></div>
+      <div class="surface tile-n"><b>12</b><span>Знаю</span></div>
+      <div class="surface tile-n"><b>2</b><span>Не знаю</span></div>
+    </div>
+    <p class="t-small muted">Всего выучено: 26 из 88 · Серия: 4 дня подряд</p>
+    <div class="actions">
+      <button class="btn btn-primary btn-block" type="button">Следующая тема: Жильё</button>
+      <button class="btn btn-secondary btn-block" type="button">К темам</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- S06 Алфавит -->
+<figure>
+<figcaption>S06 Алфавит: птицепись в заголовке (критерии 32, 33)</figcaption>
+<div class="phone is-tall">
+  <div class="screen">
+    <div class="alpha-head">
+      <svg class="bird" aria-hidden="true"><use href="#bird-a"/></svg>
+      <div><h1 class="t-title">Алфавит</h1><span class="muted t-small">39 букв восточноармянского алфавита</span></div>
+    </div>
+    <p class="muted t-small">Здесь только справочник, упражнений нет.</p>
+    <button class="btn btn-secondary btn-block" type="button" aria-expanded="false">Как читать транслитерацию</button>
+    <table class="alpha-table">
+      <caption class="sr-only">Армянский алфавит</caption>
+      <thead><tr><th scope="col">Буква</th><th scope="col">Транслитерация</th><th scope="col">Как читать</th></tr></thead>
+      <tbody>
+        <tr><td class="hy letter-xl" lang="hy">Ա ա</td><td class="t-heading">a</td><td>а</td></tr>
+        <tr><td class="hy letter-xl" lang="hy">Բ բ</td><td class="t-heading">b</td><td>б</td></tr>
+        <tr><td class="hy letter-xl" lang="hy">Գ գ</td><td class="t-heading">g</td><td>г</td></tr>
+        <tr><td class="hy letter-xl" lang="hy">Դ դ</td><td class="t-heading">d</td><td>д</td></tr>
+        <tr><td class="hy letter-xl" lang="hy">Ե ե</td><td class="t-heading">ye / e</td><td>йе / е</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#" aria-current="page"><span class="hy-l" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<!-- S10 Вставка списка -->
+<figure>
+<figcaption>S10 Вставить список (критерии 58–59)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Вставить список</h1></div>
+  <div class="screen">
+    <div class="field">
+      <label for="paste">Слова по одному на строке</label>
+      <textarea id="paste" class="textarea hy" lang="hy" aria-describedby="paste-hint">1) բարև — привет
+2. հաց	хлеб
+• կաթ – молоко
+ջուր; вода; jur
+shuka — рынок
+սուրճ кофе</textarea>
+      <p id="paste-hint" class="hint">Формат: «բարև — привет». Разделитель: тире, табуляция или точка с запятой. Третья часть — транслитерация. Не больше 500 строк.</p>
+    </div>
+    <p class="hint">Нет армянской раскладки? Включите её в настройках клавиатуры телефона.</p>
+  </div>
+  <div class="stickybar"><button class="btn btn-primary btn-block" type="button">Разобрать</button></div>
+</div>
+</figure>
+
+<!-- S11 Предпросмотр -->
+<figure>
+<figcaption>S11 Предпросмотр вставки (критерии 57, 63–65)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Проверьте список</h1></div>
+  <div class="screen">
+    <p><strong>Распознано: 6</strong>, с ошибками: 2, пустых строк пропущено: 1</p>
+
+    <div class="field">
+      <label for="set1">Сохранить в набор</label>
+      <select id="set1" class="select"><option>Новый набор…</option><option>Урок 5</option></select>
+    </div>
+    <div class="field">
+      <label for="newset">Название нового набора</label>
+      <input id="newset" class="input" value="Набор от 17.10">
+    </div>
+
+    <div class="section-head">
+      <h2 class="t-heading">Слова</h2>
+      <span>
+        <button class="btn btn-text" type="button">Отметить все</button>
+        <button class="btn btn-text" type="button">Снять</button>
+      </span>
+    </div>
+    <ul class="list">
+      <li class="pv-row"><label class="check"><input type="checkbox" checked><span class="sr-only">Сохранить: բարև</span></label>
+        <div class="pv-body"><div class="line"><span class="hy hy-list" lang="hy">բարև</span><span class="translit-sm">barev</span><span class="chip chip-auto">авто</span></div><span>привет</span></div></li>
+      <li class="pv-row"><label class="check"><input type="checkbox" checked><span class="sr-only">Сохранить: հաց</span></label>
+        <div class="pv-body"><div class="line"><span class="hy hy-list" lang="hy">հաց</span><span class="translit-sm">hats'</span><span class="chip chip-auto">авто</span></div><span>хлеб</span></div></li>
+      <li class="pv-row"><label class="check"><input type="checkbox" checked><span class="sr-only">Сохранить: ջուր</span></label>
+        <div class="pv-body"><div class="line"><span class="hy hy-list" lang="hy">ջուր</span><span class="translit-sm">jur</span></div><span>вода</span></div></li>
+      <li class="pv-row"><label class="check"><input type="checkbox" checked><span class="sr-only">Сохранить: կաթ</span></label>
+        <div class="pv-body"><div class="line"><span class="hy hy-list" lang="hy">կաթ</span><span class="translit-sm">kat'</span><span class="chip chip-auto">авто</span></div><span>молоко</span></div></li>
+      <li class="pv-row is-off"><label class="check"><input type="checkbox"><span class="sr-only">Сохранить: բարև (повтор)</span></label>
+        <div class="pv-body"><div class="line"><span class="hy hy-list" lang="hy">բարև</span><span class="translit-sm">barev</span><span class="chip chip-auto">авто</span></div><span>здравствуй</span><span><span class="chip chip-warn">⚠ Повтор строки 1</span></span></div></li>
+      <li class="pv-row is-off"><label class="check"><input type="checkbox"><span class="sr-only">Сохранить: լավ (уже есть)</span></label>
+        <div class="pv-body"><div class="line"><span class="hy hy-list" lang="hy">լավ</span><span class="translit-sm">lav</span><span class="chip chip-auto">авто</span></div><span>хорошо</span><span><span class="chip chip-warn">⚠ Уже есть в наборе</span></span></div></li>
+    </ul>
+
+    <h2 class="t-heading">Строки с ошибками (2)</h2>
+    <ul class="list">
+      <li class="err-row"><span class="t-caption muted">Строка 5</span><code>shuka — рынок</code><span class="why">Не понятно, где армянское слово: армянских букв нет ни в одной части</span></li>
+      <li class="err-row"><span class="t-caption muted">Строка 6</span><code>սուրճ кофе</code><span class="why">Не найден разделитель: используйте тире, табуляцию или точку с запятой</span></li>
+    </ul>
+  </div>
+  <div class="stickybar">
+    <button class="btn btn-primary btn-block" type="button">Сохранить 4 слова</button>
+    <button class="btn btn-secondary btn-block" type="button">Исправить текст</button>
+  </div>
+</div>
+</figure>
+
+<!-- S14 Сопоставление колонок -->
+<figure>
+<figcaption>S14 Сопоставление колонок при импорте (критерии 74–76, 101)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Что в колонках</h1></div>
+  <div class="screen">
+    <p class="muted t-small">Файл «lesson5.xlsx», лист «Лист1». Показаны первые 5 строк из 14.</p>
+    <label class="check"><input type="checkbox" checked> Первая строка — заголовки</label>
+    <div class="map-scroll" tabindex="0" role="region" aria-label="Первые строки файла">
+      <table class="map-table">
+        <thead><tr>
+          <th scope="col"><span class="colname">Колонка A</span><select class="select" aria-label="Роль колонки A"><option>Армянское слово</option></select></th>
+          <th scope="col"><span class="colname">Колонка B</span><select class="select" aria-label="Роль колонки B"><option>Перевод</option></select></th>
+          <th scope="col"><span class="colname">Колонка C</span><select class="select" aria-label="Роль колонки C"><option>Транслитерация</option></select></th>
+          <th scope="col"><span class="colname">Колонка D</span><select class="select" aria-label="Роль колонки D"><option>Не импортировать</option></select></th>
+        </tr></thead>
+        <tbody>
+          <tr class="is-header"><td>Слово</td><td>Перевод</td><td>Произношение</td><td>Заметки</td></tr>
+          <tr><td class="hy hy-small" lang="hy">բարև</td><td>привет</td><td>barev</td><td></td></tr>
+          <tr><td class="hy hy-small" lang="hy">հաց</td><td>хлеб</td><td></td><td>на столе</td></tr>
+          <tr><td class="hy hy-small" lang="hy">ջուր</td><td>вода</td><td>jur</td><td></td></tr>
+          <tr><td class="hy hy-small" lang="hy">կաթ</td><td>молоко</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="banner banner-ok" role="status"><span aria-hidden="true">✓</span><span>Колонки определены по заголовкам. Проверьте и нажмите «Далее».</span></div>
+    <div class="banner banner-info"><span>Формат файла: «Армянское слово | Перевод | Транслитерация», например «բարև | привет | barev».</span></div>
+  </div>
+  <div class="stickybar"><button class="btn btn-primary btn-block" type="button">Далее</button></div>
+</div>
+</figure>
+
+<!-- S12 Форма с ошибками -->
+<figure>
+<figcaption>S12 Форма слова, состояния ошибок (критерии 45–51, 56, 67–68)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Добавить слово</h1></div>
+  <div class="screen">
+    <div class="field is-error">
+      <label for="hy">Армянское слово</label>
+      <input id="hy" class="input hy" lang="hy" value="կաfe" aria-invalid="true" aria-describedby="hy-err">
+      <p class="hint" aria-hidden="true">Как вы ввели: <span class="hy hy-small" lang="hy">կա<span class="bad-char">f</span><span class="bad-char">e</span></span></p>
+      <p id="hy-err" class="error-text"><span aria-hidden="true">⚠</span><span>В армянском слове есть латинские или русские буквы: f, e. Часто это похожие буквы из другой раскладки — наберите их армянскими.</span></p>
+    </div>
+    <div class="field is-error">
+      <label for="ru">Перевод</label>
+      <input id="ru" class="input" aria-invalid="true" aria-describedby="ru-err">
+      <p id="ru-err" class="error-text"><span aria-hidden="true">⚠</span><span>Введите перевод</span></p>
+    </div>
+    <div class="field">
+      <label for="tr">Транслитерация <span class="opt">(необязательно)</span></label>
+      <input id="tr" class="input" aria-describedby="tr-hint">
+      <p id="tr-hint" class="hint">Оставьте пустым — создадим автоматически</p>
+    </div>
+    <div class="field">
+      <label for="set2">Набор</label>
+      <select id="set2" class="select"><option>Урок 5</option></select>
+    </div>
+  </div>
+  <div class="stickybar">
+    <button class="btn btn-primary btn-block" type="button">Сохранить</button>
+    <button class="btn btn-secondary btn-block" type="button">Готово</button>
+  </div>
+</div>
+</figure>
+
+<!-- D Диалог -->
+<figure>
+<figcaption>S15 Диалог подтверждения: удаление набора (критерий 41)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Урок 5</h1></div>
+  <div class="screen"><p class="muted">Экран набора (под затемнением)</p></div>
+  <div class="scrim">
+    <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t">
+      <h2 id="dlg-t" class="t-heading">Удалить набор «Урок 5» и 13 слов? Прогресс по ним будет потерян.</h2>
+      <button class="btn btn-danger btn-block" type="button">Удалить</button>
+      <button class="btn btn-secondary btn-block" type="button">Отмена</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- Значки тем крупно -->
+<figure>
+<figcaption>Значки тем (одна линия, один стиль; 48 px и 96 px)</figcaption>
+<div class="phone is-tall" style="min-height:0">
+  <div class="screen" style="flex-direction:row; flex-wrap:wrap; gap:20px; justify-content:center">
+    <div style="text-align:center"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-greetings"/></svg><span class="t-caption">Приветствия</span></div>
+    <div style="text-align:center"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-numbers"/></svg><span class="t-caption">Числа (счёты)</span></div>
+    <div style="text-align:center"><svg class="ic ic-shop" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-shop"/></svg><span class="t-caption">Магазин</span></div>
+    <div style="text-align:center"><svg class="ic ic-transport" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-transport"/></svg><span class="t-caption">Транспорт</span></div>
+    <div style="text-align:center"><svg class="ic ic-housing" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-housing"/></svg><span class="t-caption">Жильё</span></div>
+    <div style="text-align:center"><svg class="ic ic-food" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-food"/></svg><span class="t-caption">Еда (лаваш)</span></div>
+  </div>
+</div>
+</figure>
+
+</main>
+
+<script>
+  // Только для просмотра прототипов: переключение темы авто, светлая, тёмная.
+  (function () {
+    var modes = [['auto', 'Тема: авто'], ['light', 'Тема: светлая'], ['dark', 'Тема: тёмная']];
+    var i = 0, b = document.getElementById('theme');
+    b.addEventListener('click', function () {
+      i = (i + 1) % 3;
+      if (modes[i][0] === 'auto') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', modes[i][0]);
+      b.textContent = modes[i][1];
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -6 108 106" width="108" height="106" role="img" aria-label="Буква Ա в виде птицы">
+  <title>Птицепись: Ա</title>
+  <!-- Цвет птицы: currentColor (задаётся через CSS color). Глаз и «пупок» тела: CSS-переменная eye (в CSS с двумя дефисами в начале имени), запасной цвет задан ниже. -->
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="8" d="M30 34V58Q30 84 52 84Q74 84 74 58V26"/>
+    <path stroke-width="5" d="M74 26L63 8M74 26L75 4M74 26L87 9"/>
+    <path stroke-width="4" d="M74 60Q80 80 95 83M95 83L91 92"/>
+    <path stroke-width="3" d="M42 66Q52 52 62 66M45 72Q52 62 59 72"/>
+    <path stroke-width="3" d="M30 13Q27 4 36 4M36 13Q39 5 47 8"/>
+  </g>
+  <circle cx="30" cy="25" r="11.5" fill="currentColor"/>
+  <path d="M20 21L4 27L20 32Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="33" cy="22" r="2.8" style="fill:var(--eye,#FFF9EA)"/>
+  <circle cx="63" cy="8" r="3" fill="currentColor"/>
+  <circle cx="75" cy="4" r="3" fill="currentColor"/>
+  <circle cx="87" cy="9" r="3" fill="currentColor"/>
+  <circle cx="52" cy="84" r="2.6" style="fill:var(--eye,#FFF9EA)"/>
+</svg>

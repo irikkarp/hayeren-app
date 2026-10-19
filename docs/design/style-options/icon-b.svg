@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Hayeren, вариант B: плоская птица-Ա на абрикосовом фоне</title>
+  <rect width="512" height="512" fill="#F8A03A"/>
+  <polygon points="0,512 64,448 128,512" fill="#C2183A"/>
+  <polygon points="128,512 192,448 256,512" fill="#C2183A"/>
+  <polygon points="256,512 320,448 384,512" fill="#C2183A"/>
+  <polygon points="384,512 448,448 512,512" fill="#C2183A"/>
+  <circle cx="256" cy="250" r="190" fill="#FFFBF8" stroke="#2B1520" stroke-width="10"/>
+  <g color="#C2183A" transform="translate(88 100) scale(3.3)">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke-width="13" d="M30 34V58Q30 84 52 84Q74 84 74 58V26"/>
+      <path stroke-width="8" d="M74 26L62 7M74 26L74 3M74 26L86 7"/>
+      <path stroke-width="8" d="M74 62Q80 80 94 83"/>
+    </g>
+    <path d="M40 62Q52 48 64 62Q58 72 52 72Q46 72 40 62Z" fill="#F8A03A"/>
+    <circle cx="30" cy="25" r="13" fill="currentColor"/>
+    <path d="M19 20L3 27L19 33Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="33" cy="22" r="3.4" fill="#FFFBF8"/>
+  </g>
+</svg>

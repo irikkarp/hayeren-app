@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" role="presentation" aria-hidden="true">
+  <title>Аревахач (колесо вечности): плитка узора 28 на 28</title>
+  <!-- Плитка повторяется по горизонтали и вертикали (CSS background-repeat или SVG pattern).
+       Прозрачность узора задаётся снаружи (opacity 0.35, не больше), см. ui-kit.md, раздел 8. -->
+  <g fill="none" stroke="#E0B95A" stroke-width="1.2">
+    <rect x="8" y="8" width="12" height="12"/>
+    <rect x="8" y="8" width="12" height="12" transform="rotate(45 14 14)"/>
+    <circle cx="14" cy="14" r="2.5"/>
+  </g>
+</svg>

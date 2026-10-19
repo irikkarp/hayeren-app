@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hayeren — вариант B «Современный Ереван»</title>
+<style>
+@font-face { font-family:'Noto Sans Armenian'; font-weight:400; font-display:swap;
+  src: local('Noto Sans Armenian'), url('../../../app/node_modules/@fontsource/noto-sans-armenian/files/noto-sans-armenian-armenian-400-normal.woff2') format('woff2'); }
+@font-face { font-family:'Noto Sans Armenian'; font-weight:700; font-display:swap;
+  src: local('Noto Sans Armenian Bold'), url('../../../app/node_modules/@fontsource/noto-sans-armenian/files/noto-sans-armenian-armenian-700-normal.woff2') format('woff2'); }
+
+:root {
+  color-scheme: light;
+  --bg:#F8E4DC; --surface:#FFFBF8; --sunken:#F0CFC4; --ink:#2B1520;
+  --text:#2B1520; --text-2:#6B4652;
+  --garnet:#C2183A; --on-garnet:#FFFFFF; --garnet-h:#A41230;
+  --apricot:#F8A03A; --on-apricot:#2B1520;
+  --blue:#1E3A8A; --blue-text:#1E3A8A; --blue-soft:#DCE3F6;
+  --success:#1F6B3A; --success-soft:#D9F0DF;
+  --shadow:#2B1520; --focus:#1E3A8A; --eye:#FFFBF8; --wing:#F8A03A;
+  --font-ui: system-ui,-apple-system,'Segoe UI',Roboto,Arial,'Noto Sans Armenian',sans-serif;
+  --font-hy: 'Noto Sans Armenian','Noto Sans',system-ui,sans-serif;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg:#1F1418; --surface:#2C1D23; --sunken:#150C10; --ink:#F8E4DC;
+  --text:#FBEAE2; --text-2:#D4B3BB;
+  --garnet:#FF6B85; --on-garnet:#2B0710; --garnet-h:#FF8DA1;
+  --blue-text:#9DB4FF; --blue-soft:#25305E;
+  --success:#8FD39B; --success-soft:#1B2E1E;
+  --shadow:#0A0507; --focus:#9DB4FF; --eye:#2C1D23;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--sunken); color:var(--text); font:400 16px/1.5 var(--font-ui); }
+h1,h2,h3,p { margin:0; }
+button { font:inherit; color:inherit; }
+:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+.hy { font-family:var(--font-hy); line-height:1.35; }
+.muted { color:var(--text-2); }
+
+.page { max-width:1240px; margin:0 auto; padding:24px 16px 64px; }
+.page > header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.page h1 { font:800 30px/1.15 var(--font-ui); letter-spacing:-.01em; }
+.page h2.sec { font:800 22px/1.3 var(--font-ui); margin:36px 0 12px; display:inline-block; background:var(--apricot); color:var(--on-apricot); padding:2px 14px; border:2px solid var(--ink); border-radius:10px; box-shadow:3px 3px 0 var(--shadow); }
+.theme-switch { min-height:44px; padding:0 18px; border-radius:12px; border:2px solid var(--ink); background:var(--surface); font-weight:700; cursor:pointer; box-shadow:3px 3px 0 var(--shadow); }
+.board { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+.card { background:var(--surface); border:2px solid var(--ink); border-radius:16px; padding:16px; box-shadow:4px 4px 0 var(--shadow); }
+.card h3 { font:800 18px/1.3 var(--font-ui); margin-bottom:8px; }
+.swatches { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.sw { border:2px solid var(--ink); border-radius:12px; overflow:hidden; background:var(--surface); font-size:13px; line-height:1.35; }
+.sw i { display:block; height:56px; border-bottom:2px solid var(--ink); }
+.sw div { padding:8px 10px; }
+.sw b { display:block; font-size:14px; }
+.ic-grid { display:flex; flex-wrap:wrap; gap:12px; }
+.ic-grid figure { margin:0; width:92px; text-align:center; font-size:13px; }
+
+/* иллюстрации: плоские цветные плитки */
+.ic { width:48px; height:48px; display:block; flex:none; }
+.ic .f1 { fill:var(--ic1); } .ic .f2 { fill:var(--ic2); }
+.ic .st { fill:none; stroke:var(--ic2); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.ic .sw2 { fill:none; stroke:var(--ic2); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.tile { width:56px; height:56px; border-radius:14px; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; flex:none; }
+.tile .ic { width:42px; height:42px; }
+.t-ararat { background:#1E3A8A; --ic1:#F8A03A; --ic2:#FFFBF8; }
+.t-num { background:#F8A03A; --ic1:#1E3A8A; --ic2:#FFFBF8; }
+.t-pom { background:#F5C9BC; --ic1:#C2183A; --ic2:#F8A03A; }
+.t-taxi { background:#1E3A8A; --ic1:#F8A03A; --ic2:#FFFBF8; }
+.t-lavash { background:#C2183A; --ic1:#FBD9A0; --ic2:#C2183A; }
+.t-jezve { background:#F8A03A; --ic1:#C2183A; --ic2:#2B1520; }
+.t-house { background:#DCE3F6; --ic1:#E8744A; --ic2:#1E3A8A; }
+.tile-lg { width:84px; height:84px; border-radius:20px; } .tile-lg .ic { width:64px; height:64px; }
+
+.phones { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; align-items:flex-start; }
+.phones figure { margin:0; }
+.phones figcaption { font:700 14px/1.4 var(--font-ui); text-align:center; margin-bottom:8px; }
+.phone { width:360px; min-height:760px; display:flex; flex-direction:column; background:var(--bg); border:3px solid var(--ink); border-radius:28px; overflow:hidden; position:relative; }
+
+.hdr { position:relative; background:var(--apricot); color:#2B1520; padding:16px 16px 28px; display:flex; align-items:center; gap:12px; min-height:104px; overflow:hidden; }
+.hdr .big { position:absolute; right:-6px; top:-30px; font:700 150px/1 var(--font-hy); color:#2B1520; opacity:.14; pointer-events:none; }
+.hdr .logo { width:56px; height:56px; background:#FFFBF8; border:2px solid #2B1520; border-radius:16px; padding:6px; color:#C2183A; --eye:#FFFBF8; flex:none; position:relative; }
+.hdr .brand { font:800 28px/1.1 var(--font-ui); position:relative; }
+.hdr .brand-hy { font:700 18px/1.3 var(--font-hy); position:relative; }
+.zig { height:12px; width:100%; position:absolute; left:0; bottom:0; display:block; }
+.screen { flex:1; padding:16px; display:flex; flex-direction:column; gap:16px; }
+.t-head { font:800 20px/1.3 var(--font-ui); display:flex; align-items:center; gap:8px; }
+.t-head::before { content:''; width:14px; height:14px; background:var(--garnet); transform:rotate(45deg); flex:none; }
+
+.growth { display:flex; gap:12px; align-items:center; padding:10px 14px; background:var(--surface); border:2px solid var(--ink); border-radius:16px; box-shadow:3px 3px 0 var(--shadow); }
+.growth b { font:800 18px/1.3 var(--font-ui); display:block; }
+.growth span { font-size:14px; line-height:1.35; color:var(--text-2); }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:52px; padding:0 20px; border-radius:14px; border:2px solid var(--ink); font-weight:800; font-size:17px; cursor:pointer; width:100%; box-shadow:0 4px 0 var(--shadow); text-align:center; }
+.btn:active { transform:translateY(3px); box-shadow:0 1px 0 var(--shadow); }
+.btn-primary { background:var(--garnet); color:var(--on-garnet); }
+.btn-primary:hover { background:var(--garnet-h); }
+.btn-apricot { background:var(--apricot); color:var(--on-apricot); }
+.btn-text { background:none; border-color:transparent; box-shadow:none; color:var(--blue-text); min-height:44px; text-decoration:underline; text-underline-offset:4px; }
+.btn small { display:block; font-weight:400; font-size:13px; }
+.repeat-lbl { display:flex; flex-direction:column; align-items:center; line-height:1.2; }
+
+.list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.row { display:flex; align-items:center; gap:12px; min-height:76px; padding:10px 14px 10px 10px; background:var(--surface); border:2px solid var(--ink); border-radius:16px; color:inherit; text-decoration:none; box-shadow:3px 3px 0 var(--shadow); }
+.row .grow { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.row .name { font-weight:800; font-size:16px; line-height:1.25; }
+.row .sub { font-size:14px; color:var(--text-2); }
+.progress { height:10px; background:var(--sunken); border:2px solid var(--ink); border-radius:999px; overflow:hidden; }
+.progress > span { display:block; height:100%; background:var(--blue); }
+:root[data-theme='dark'] .progress > span { background:#9DB4FF; }
+.chip-ok { display:inline-flex; gap:4px; align-items:center; padding:3px 10px; border-radius:999px; background:var(--success-soft); color:var(--success); border:2px solid var(--success); font-weight:800; font-size:13px; white-space:nowrap; }
+.chev { font-size:22px; font-weight:800; }
+
+.tabbar { display:flex; border-top:3px solid var(--ink); background:var(--surface); margin-top:auto; }
+.tab { flex:1; min-height:62px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:13px; color:var(--text-2); text-decoration:none; position:relative; }
+.tab svg { width:24px; height:24px; }
+.tab .hy-l { font:700 20px/24px var(--font-hy); }
+.tab[aria-current='page'] { color:var(--on-apricot); font-weight:800; background:var(--apricot); }
+.tab + .tab { border-left:2px solid var(--ink); }
+
+.session-top { display:flex; align-items:center; gap:8px; min-height:56px; padding:0 8px; }
+.session-top .count { flex:1; text-align:center; font-size:14px; font-weight:700; }
+.icon-btn { min-width:44px; min-height:44px; border:2px solid var(--ink); background:var(--surface); border-radius:12px; font-size:22px; font-weight:800; cursor:pointer; }
+.pbar { height:12px; margin:0 16px; background:var(--surface); border:2px solid var(--ink); border-radius:999px; overflow:hidden; }
+.pbar span { display:block; width:30%; height:100%; background:var(--garnet); }
+.word-card { position:relative; flex:1; min-height:360px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:28px 14px; background:var(--surface); border:3px solid var(--ink); border-radius:24px; box-shadow:6px 6px 0 var(--shadow); overflow:hidden; }
+.word-card .wm { position:absolute; width:240px; height:240px; right:-50px; top:-40px; color:var(--apricot); opacity:.35; --eye:var(--surface); pointer-events:none; }
+.word-card > *:not(.wm) { position:relative; }
+.zigcard { position:absolute !important; left:0; bottom:0; width:100%; height:12px; }
+.hy-hero { font:700 28px/1.3 var(--font-hy); color:var(--blue-text); word-break:keep-all; max-width:100%; }
+.translit { font-size:20px; font-weight:700; background:var(--blue-soft); padding:2px 14px; border-radius:999px; color:var(--text); }
+.sound { min-width:56px; min-height:56px; border-radius:999px; border:2px solid var(--ink); background:var(--apricot); color:#2B1520; font-size:22px; cursor:pointer; box-shadow:0 3px 0 var(--shadow); }
+.hint { font-size:14px; color:var(--text-2); }
+.bar { display:flex; flex-direction:column; gap:8px; padding:12px 16px 16px; background:var(--surface); border-top:3px solid var(--ink); }
+
+.win { flex:1; display:flex; flex-direction:column; }
+.win-top { position:relative; background:#1E3A8A; padding:28px 16px 36px; display:flex; flex-direction:column; align-items:center; gap:10px; overflow:hidden; }
+.win-top .star { position:absolute; width:380px; height:380px; left:-10px; top:-100px; opacity:.9; }
+.win-top .bird { width:160px; height:160px; color:#FFFBF8; --eye:#1E3A8A; position:relative; }
+.win-top h2 { position:relative; font:800 30px/1.15 var(--font-ui); color:#FFFFFF; }
+.win-top .zig { bottom:0; }
+.win-body { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; align-items:center; text-align:center; }
+.win-stats { display:flex; gap:10px; width:100%; }
+.win-stats .card { flex:1; padding:8px; box-shadow:3px 3px 0 var(--shadow); }
+.win-stats b { font:800 26px/1.1 var(--font-ui); display:block; color:var(--garnet); }
+.win-stats span { font-size:13px; color:var(--text-2); }
+.win-body .actions { width:100%; display:flex; flex-direction:column; gap:10px; margin-top:auto; }
+
+.band { height:36px; border-radius:10px; border:2px solid var(--ink); background:#1E3A8A; overflow:hidden; }
+.band svg { width:100%; height:100%; display:block; }
+.bird-big { width:140px; height:140px; color:var(--garnet); --eye:var(--surface); }
+.alpha-head { display:flex; align-items:center; gap:12px; background:var(--apricot); color:#2B1520; border:2px solid var(--ink); border-radius:16px; padding:10px 14px; box-shadow:3px 3px 0 var(--shadow); }
+.alpha-head .bird { width:64px; height:64px; color:#C2183A; --eye:#F8A03A; flex:none; background:#FFFBF8; border:2px solid #2B1520; border-radius:14px; padding:4px; }
+.alpha-head h3 { margin:0; font:800 24px/1.2 var(--font-ui); }
+@media (prefers-reduced-motion:no-preference) { .btn { transition:transform .08s, box-shadow .08s; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- Зигзаг в духе геометрии туфовых фасадов -->
+    <pattern id="zigA" width="24" height="12" patternUnits="userSpaceOnUse">
+      <polygon points="0,12 12,0 24,12" fill="#F8A03A"/>
+      <polygon points="6,12 12,5 18,12" fill="#C2183A"/>
+    </pattern>
+    <pattern id="zigB" width="24" height="12" patternUnits="userSpaceOnUse">
+      <polygon points="0,12 12,0 24,12" fill="#C2183A"/>
+      <polygon points="6,12 12,5 18,12" fill="#2B1520"/>
+    </pattern>
+    <pattern id="zigC" width="24" height="12" patternUnits="userSpaceOnUse">
+      <polygon points="0,12 12,0 24,12" fill="#F8A03A"/>
+      <polygon points="6,12 12,5 18,12" fill="#C2183A"/>
+    </pattern>
+
+    <!-- Аревахач: плоская восьмиконечная звезда (знак вечности) -->
+    <symbol id="arev" viewBox="0 0 100 100">
+      <rect x="22" y="22" width="56" height="56" fill="currentColor"/>
+      <rect x="22" y="22" width="56" height="56" fill="currentColor" transform="rotate(45 50 50)"/>
+      <circle cx="50" cy="50" r="14" style="fill:var(--arev-core)"/>
+    </symbol>
+
+    <!-- Птицепись B: плоская толстая птица-Ա -->
+    <symbol id="bird-b" viewBox="0 0 100 100">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke-width="13" d="M30 34V58Q30 84 52 84Q74 84 74 58V26"/>
+        <path stroke-width="8" d="M74 26L62 7M74 26L74 3M74 26L86 7"/>
+        <path stroke-width="8" d="M74 62Q80 80 94 83"/>
+      </g>
+      <path d="M40 62Q52 48 64 62Q58 72 52 72Q46 72 40 62Z" style="fill:var(--wing)"/>
+      <circle cx="30" cy="25" r="13" fill="currentColor"/>
+      <path d="M19 20L3 27L19 33Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="33" cy="22" r="3.4" style="fill:var(--eye)"/>
+    </symbol>
+
+    <symbol id="apricot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#F8A03A" stroke="#2B1520" stroke-width="2"/><path d="M12 3Q16 1 18 3Q15 5 12 5" fill="#3E9B5F" stroke="#2B1520" stroke-width="1.2"/></symbol>
+    <symbol id="tree" viewBox="0 0 80 80">
+      <path d="M36 76V46M44 76V46" stroke="#2B1520" stroke-width="2" fill="#8B5A3C"/>
+      <rect x="36" y="44" width="8" height="32" fill="#8B5A3C" stroke="#2B1520" stroke-width="2"/>
+      <circle cx="40" cy="30" r="24" fill="#3E9B5F" stroke="#2B1520" stroke-width="2"/>
+      <circle cx="30" cy="26" r="5.5" fill="#F8A03A" stroke="#2B1520" stroke-width="1.6"/>
+      <circle cx="46" cy="22" r="5.5" fill="#F8A03A" stroke="#2B1520" stroke-width="1.6"/>
+      <circle cx="42" cy="38" r="5.5" fill="#F8A03A" stroke="#2B1520" stroke-width="1.6"/>
+      <circle cx="26" cy="40" r="4.5" fill="none" stroke="#FFFBF8" stroke-width="1.6" stroke-dasharray="3 2"/>
+      <circle cx="54" cy="34" r="4.5" fill="none" stroke="#FFFBF8" stroke-width="1.6" stroke-dasharray="3 2"/>
+    </symbol>
+
+    <symbol id="i-ararat" viewBox="0 0 32 32">
+      <path class="f1" d="M1 27L11 6L18 20L24 12L31 27Z"/>
+      <path class="f2" d="M11 6L7.5 13L10 12L11.5 14.5L13.8 11.6Z"/>
+      <path class="f2" d="M24 12L21.5 16L24 15.2L26 16.5Z"/>
+    </symbol>
+    <symbol id="i-pom" viewBox="0 0 32 32">
+      <path class="f2" d="M9 10L10 5L14 8L16 4L18 8L22 5L23 10Z"/>
+      <circle class="f1" cx="16" cy="19" r="10.5"/>
+      <path class="sw2" d="M9.5 18Q10.5 13 14.5 12.2" style="stroke:#FFFBF8"/>
+    </symbol>
+    <symbol id="i-lavash" viewBox="0 0 32 32">
+      <path class="f1" d="M2 11Q16 4 30 11L28 24Q16 30 4 24Z"/>
+      <path class="sw2" d="M8 14Q16 11 24 14M8 19Q16 16 24 19" style="stroke:#C98A3C"/>
+    </symbol>
+    <symbol id="i-taxi" viewBox="0 0 32 32">
+      <rect class="f2" x="12" y="5" width="8" height="5" rx="1.2"/>
+      <path class="f1" d="M3 22L5.5 14Q6.5 11 9.5 11H22.5Q25.5 11 26.5 14L29 22V25H3Z"/>
+      <path class="sw2" d="M9 14H23" style="stroke:#1E3A8A"/>
+      <circle class="f2" cx="9" cy="25" r="3.2"/><circle class="f2" cx="23" cy="25" r="3.2"/>
+    </symbol>
+    <symbol id="i-jezve" viewBox="0 0 32 32">
+      <path class="f1" d="M9 27L12 13H20L23 27Z"/>
+      <path class="f1" d="M13 13L14 6H18L19 13Z"/>
+      <path class="f1" d="M13 6L10 3L15 4Z"/>
+      <path class="st" d="M23 15Q30 16 27 25" style="stroke:#C2183A"/>
+    </symbol>
+    <symbol id="i-house" viewBox="0 0 32 32">
+      <path class="f1" d="M4 16L16 5L28 16V27H4Z"/>
+      <rect class="f2" x="13" y="19" width="6" height="8" rx="3"/>
+    </symbol>
+    <symbol id="i-num" viewBox="0 0 32 32">
+      <rect class="f1" x="3" y="5" width="26" height="22" rx="5"/>
+      <path class="sw2" d="M9 12L11.5 10V22M16 13Q16 10 19 10Q22 10 22 13Q22 16 16 22H23"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page">
+<header>
+  <div>
+    <h1>Вариант B «Современный Ереван»</h1>
+    <p class="muted">Розовый туф, абрикос и гранат, плоская графика, жирные контуры. Настроение: бодрое, уличное, «современная Армения».</p>
+  </div>
+  <button class="theme-switch" type="button" id="ts">Тёмная тема</button>
+</header>
+
+<h2 class="sec">Мини-мудборд</h2>
+<div class="swatches" aria-label="Палитра">
+  <div class="sw"><i style="background:#F8E4DC"></i><div><b>Туф</b>#F8E4DC<br>фон (светлая)</div></div>
+  <div class="sw"><i style="background:#FFFBF8"></i><div><b>Известняк</b>#FFFBF8<br>карточки</div></div>
+  <div class="sw"><i style="background:#C2183A"></i><div><b>Гранат</b>#C2183A<br>кнопки, белый текст 5.9:1</div></div>
+  <div class="sw"><i style="background:#F8A03A"></i><div><b>Абрикос</b>#F8A03A<br>шапка, активные вкладки, тёмный текст 8:1</div></div>
+  <div class="sw"><i style="background:#1E3A8A"></i><div><b>Арарат</b>#1E3A8A<br>слово, прогресс, 9:1</div></div>
+  <div class="sw"><i style="background:#2B1520"></i><div><b>Чернила</b>#2B1520<br>текст и контуры</div></div>
+  <div class="sw"><i style="background:#1F1418"></i><div><b>Тёмная: ночной Ереван</b>#1F1418<br>гранат #FF6B85, синий #9DB4FF</div></div>
+</div>
+
+<div class="board" style="margin-top:16px">
+  <div class="card">
+    <h3>Шрифты</h3>
+    <div class="hy" lang="hy" style="font-size:44px;font-weight:700;line-height:1.25;color:var(--blue-text)">Հայերեն</div>
+    <div style="font:800 22px/1.3 var(--font-ui)">Заголовки: системный sans, 800</div>
+    <p class="muted" style="margin-top:6px">Армянский: Noto Sans Armenian Bold (тот же, что в текущем UI-ките), крупные буквы как графика.</p>
+  </div>
+  <div class="card">
+    <h3>Орнамент: зигзаг туфа и аревахач</h3>
+    <div class="band"><svg aria-hidden="true" style="background:#1E3A8A"><rect y="12" width="100%" height="12" fill="url(#zigA)"/></svg></div>
+    <div style="display:flex;gap:16px;align-items:center;margin-top:10px">
+      <svg width="56" height="56" viewBox="0 0 100 100" aria-hidden="true" style="color:#C2183A;--arev-core:#F8A03A"><use href="#arev"/></svg>
+      <svg width="40" height="40" viewBox="0 0 100 100" aria-hidden="true" style="color:#F8A03A;--arev-core:#1E3A8A"><use href="#arev"/></svg>
+      <span class="muted" style="font-size:14px">Кромка шапки и карточки, фон праздника</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Птицепись: Ա</h3>
+    <div style="display:flex;gap:16px;align-items:center">
+      <svg class="bird-big" viewBox="-4 -6 108 106" aria-label="Буква Ա в виде птицы"><use href="#bird-b" width="100" height="100"/></svg>
+      <p class="muted" style="font-size:14px">Плоская жирная птица: голова с клювом, крыло-акцент, хвост-веер, лапка.</p>
+    </div>
+    <div class="alpha-head" style="margin-top:10px">
+      <svg class="bird" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-b" width="100" height="100"/></svg>
+      <div><h3>Алфавит</h3><span style="font-size:14px">38 букв</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Иллюстрации тем</h3>
+    <div class="ic-grid">
+      <figure><span class="tile t-ararat" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-ararat"/></svg></span>Приветствия</figure>
+      <figure><span class="tile t-pom" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-pom"/></svg></span>Гранат</figure>
+      <figure><span class="tile t-lavash" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-lavash"/></svg></span>Лаваш</figure>
+      <figure><span class="tile t-taxi" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-taxi"/></svg></span>Такси</figure>
+      <figure><span class="tile t-jezve" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-jezve"/></svg></span>Кафе</figure>
+      <figure><span class="tile t-house" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-house"/></svg></span>Жильё</figure>
+      <figure><span class="tile t-num" style="margin:0 auto 4px"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-num"/></svg></span>Числа</figure>
+    </div>
+  </div>
+</div>
+
+<h2 class="sec">Экраны</h2>
+<div class="phones">
+
+<figure>
+<figcaption>Главная</figcaption>
+<div class="phone">
+  <div class="hdr">
+    <span class="big hy" lang="hy" aria-hidden="true">Հ</span>
+    <svg class="logo" viewBox="-4 -6 108 106" aria-hidden="true" style="--wing:#F8A03A"><use href="#bird-b" width="100" height="100"/></svg>
+    <div><div class="brand">Hayeren</div><div class="brand-hy" lang="hy">Հայերեն</div></div>
+    <svg class="zig" aria-hidden="true"><rect width="100%" height="12" fill="url(#zigB)"/></svg>
+  </div>
+  <div class="screen">
+    <div class="growth" role="group" aria-label="Серия дней: 3 дня подряд, абрикосовое дерево растёт">
+      <svg width="76" height="76" viewBox="0 0 80 80" aria-hidden="true"><use href="#tree"/></svg>
+      <div><b>3 дня подряд</b><span>Абрикос зреет: ещё 2 дня до урожая</span></div>
+    </div>
+
+    <button class="btn btn-primary" type="button">
+      <span class="repeat-lbl">Повторить (7)<small>освежить слова из всех тем</small></span>
+    </button>
+
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile t-ararat"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-ararat"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="sub">выучено 6 из 15</span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="6" aria-label="Выучено 6 из 15"><span style="width:40%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile t-num"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-num"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="sub">выучено 4 из 15</span><span class="progress"><span style="width:27%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile t-pom"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-pom"/></svg></span><span class="grow"><span class="name">Магазин и рынок</span><span class="sub">выучено 0 из 14</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile t-taxi"><svg class="ic" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-taxi"/></svg></span><span class="grow"><span class="name">Транспорт и такси</span><span class="sub">выучено 12 из 12</span></span><span class="chip-ok">✓ Выучена</span></a></li>
+    </ul>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#"><span class="hy-l hy" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<figure>
+<figcaption>Карточка слова (лицевая сторона)</figcaption>
+<div class="phone">
+  <div class="session-top">
+    <button class="icon-btn" type="button" aria-label="Закрыть сессию">×</button>
+    <span class="count">Слово 3 из 10</span>
+    <span style="min-width:44px"></span>
+  </div>
+  <div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="3" aria-label="Слово 3 из 10"><span></span></div>
+  <div class="screen">
+    <div class="word-card">
+      <svg class="wm" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-b" width="100" height="100"/></svg>
+      <div class="hy-hero" lang="hy">շնորհակալություն</div>
+      <div class="translit">shnorhakalut’yun</div>
+      <button class="sound" type="button" aria-label="Прослушать слово">♪</button>
+      <p class="hint">Вспомни перевод, затем проверь себя</p>
+      <svg class="zigcard" aria-hidden="true"><rect width="100%" height="12" fill="url(#zigC)"/></svg>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="btn btn-apricot" type="button">Показать перевод</button>
+    <button class="btn btn-text" type="button">Пропустить</button>
+  </div>
+</div>
+</figure>
+
+<figure>
+<figcaption>Тема выучена</figcaption>
+<div class="phone">
+  <div class="win">
+    <div class="win-top">
+      <svg class="star" viewBox="0 0 100 100" aria-hidden="true" style="color:#2A4DA8;--arev-core:#1E3A8A"><use href="#arev"/></svg>
+      <svg class="bird" viewBox="-4 -6 108 106" aria-hidden="true" style="--wing:#F8A03A"><use href="#bird-b" width="100" height="100"/></svg>
+      <h2>Тема выучена!</h2>
+      <svg class="zig" aria-hidden="true"><rect width="100%" height="12" fill="url(#zigA)"/></svg>
+    </div>
+    <div class="win-body">
+      <p>Транспорт и такси: все 12 слов. <span class="hy" lang="hy" style="font-weight:700">Շատ լավ!</span></p>
+      <svg width="96" height="96" viewBox="0 0 80 80" aria-hidden="true"><use href="#tree"/></svg>
+      <div class="win-stats">
+        <div class="card"><b>+12</b><span>слов выучено</span></div>
+        <div class="card"><b>24</b><span>из 101 всего</span></div>
+        <div class="card"><b>4</b><span>дня подряд</span></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" type="button">Следующая тема: Кафе и еда</button>
+        <button class="btn btn-text" type="button">На главную</button>
+      </div>
+    </div>
+  </div>
+</div>
+</figure>
+
+</div>
+</div>
+<script>
+(function(){
+  var r=document.documentElement, b=document.getElementById('ts');
+  if(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches){r.dataset.theme='dark';}
+  function sync(){b.textContent=r.dataset.theme==='dark'?'Светлая тема':'Тёмная тема';}
+  b.addEventListener('click',function(){r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';sync();});
+  sync();
+})();
+</script>
+</body>
+</html>

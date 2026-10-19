@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hayeren — вариант A «Рукопись»</title>
+<style>
+@font-face { font-family:'Noto Sans Armenian'; font-weight:400; font-display:swap;
+  src: local('Noto Sans Armenian'), url('../../../app/node_modules/@fontsource/noto-sans-armenian/files/noto-sans-armenian-armenian-400-normal.woff2') format('woff2'); }
+@font-face { font-family:'Noto Sans Armenian'; font-weight:700; font-display:swap;
+  src: local('Noto Sans Armenian Bold'), url('../../../app/node_modules/@fontsource/noto-sans-armenian/files/noto-sans-armenian-armenian-700-normal.woff2') format('woff2'); }
+
+:root {
+  color-scheme: light;
+  --bg:#F4E7CB; --surface:#FFF9EA; --sunken:#EBD9B3; --line:#CDB07A; --border-strong:#8A6A3A;
+  --text:#2A1812; --text-2:#664B38;
+  --primary:#8C1C2F; --primary-h:#701524; --on-primary:#FFF8E8; --primary-soft:#F1D8D0;
+  --gold:#B58A2A; --blue:#233F73; --apricot:#C8641F;
+  --success:#2E6B3B; --success-soft:#E1EDD2;
+  --hdr-bg:#7E1727; --hdr-text:#FFF3D8; --focus:#233F73;
+  --eye:#FFF9EA;
+  --font-head: 'Noto Serif Armenian','Noto Serif',Georgia,'Times New Roman',serif;
+  --font-ui: system-ui,-apple-system,'Segoe UI',Roboto,Arial,'Noto Sans Armenian',sans-serif;
+  --font-hy: 'Noto Serif Armenian','Noto Sans Armenian','Noto Sans',system-ui,sans-serif;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg:#1D1311; --surface:#2A1B17; --sunken:#140D0B; --line:#5A4330; --border-strong:#A88C66;
+  --text:#F6E9CF; --text-2:#CDB896;
+  --primary:#E4707F; --primary-h:#EE8D99; --on-primary:#2A0710; --primary-soft:#3C1F22;
+  --gold:#E2B857; --blue:#8FB0F0; --apricot:#F2A15E;
+  --success:#8FD39B; --success-soft:#1B2E1E;
+  --hdr-bg:#4A1019; --hdr-text:#FFF3D8; --focus:#8FB0F0;
+  --eye:#2A1B17;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--sunken); color:var(--text); font:400 16px/1.5 var(--font-ui); }
+h1,h2,h3,p { margin:0; }
+button { font:inherit; color:inherit; }
+:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+.hy { font-family:var(--font-hy); line-height:1.35; }
+.head { font-family:var(--font-head); }
+.muted { color:var(--text-2); }
+
+/* ---- страница-обёртка ---- */
+.page { max-width:1240px; margin:0 auto; padding:24px 16px 64px; }
+.page > header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.page h1 { font:700 28px/1.2 var(--font-head); }
+.page h2.sec { font:700 22px/1.3 var(--font-head); margin:36px 0 12px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+.theme-switch { min-height:44px; padding:0 18px; border-radius:999px; border:2px solid var(--border-strong); background:var(--surface); font-weight:700; cursor:pointer; }
+.board { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px; }
+.swatches { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.sw { border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface); font-size:13px; line-height:1.35; }
+.sw i { display:block; height:56px; }
+.sw div { padding:8px 10px; }
+.sw b { display:block; font-size:14px; }
+.ic-grid { display:flex; flex-wrap:wrap; gap:12px; }
+.ic-grid figure { margin:0; width:92px; text-align:center; font-size:13px; }
+
+/* ---- иллюстрации тем: линейный стиль «миниатюра» ---- */
+.ic { width:48px; height:48px; flex:none; display:block; }
+.ic .f1 { fill:var(--ic1); stroke:var(--ink); stroke-width:1.1; stroke-linejoin:round; }
+.ic .f2 { fill:var(--ic2); stroke:var(--ink); stroke-width:1.1; stroke-linejoin:round; }
+.ic .st { fill:none; stroke:var(--ink); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+.ic .sw2 { fill:none; stroke:var(--ic2); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.ic { --ink:#3B2418; }
+:root[data-theme='dark'] .ic { --ink:#F6E9CF; }
+.ic-ararat { --ic1:#4E6FAE; --ic2:#FFF9EA; }
+.ic-pom { --ic1:#A82238; --ic2:#E2B857; }
+.ic-lavash { --ic1:#D9A15B; --ic2:#EBC283; }
+.ic-taxi { --ic1:#E2B857; --ic2:#FFF9EA; }
+.ic-jezve { --ic1:#C8641F; --ic2:#E2B857; }
+.ic-house { --ic1:#D79B8A; --ic2:#8C1C2F; }
+.ic-num { --ic1:#4E6FAE; --ic2:#FFF9EA; }
+
+/* ---- телефон ---- */
+.phones { display:flex; flex-wrap:wrap; gap:32px; justify-content:center; align-items:flex-start; }
+.phones figure { margin:0; }
+.phones figcaption { font:700 14px/1.4 var(--font-ui); text-align:center; margin-bottom:8px; }
+.phone { width:360px; min-height:760px; display:flex; flex-direction:column; background:var(--bg); border:2px solid var(--gold); border-radius:28px; overflow:hidden; position:relative; }
+.hdr { position:relative; background:var(--hdr-bg); color:var(--hdr-text); padding:14px 16px 18px; border-bottom:3px double var(--gold); display:flex; align-items:center; gap:12px; min-height:84px; }
+.hdr svg.pat { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.hdr > *:not(.pat) { position:relative; }
+.hdr .logo { width:52px; height:52px; color:#F2D58A; flex:none; --eye:#7E1727; }
+.hdr .brand { font:700 26px/1.1 var(--font-head); }
+.hdr .brand-hy { font:400 18px/1.3 var(--font-hy); opacity:.92; }
+.screen { flex:1; padding:16px; display:flex; flex-direction:column; gap:16px; }
+.t-head { font:700 19px/1.3 var(--font-head); display:flex; align-items:center; gap:8px; }
+.t-head::after { content:''; flex:1; height:1px; background:var(--line); }
+
+.growth { display:flex; gap:12px; align-items:center; padding:12px 14px; background:var(--surface); border:1px solid var(--line); border-radius:16px; }
+.growth .trees { display:flex; align-items:flex-end; gap:2px; height:56px; flex:none; width:128px; }
+.growth .trees svg { flex:none; }
+.growth b { font:700 17px/1.3 var(--font-head); display:block; }
+.growth span { font-size:14px; line-height:1.35; color:var(--text-2); }
+
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:52px; padding:0 20px; border-radius:14px; border:2px solid transparent; font-weight:700; font-size:16px; cursor:pointer; text-align:center; width:100%; }
+.btn-primary { background:var(--primary); color:var(--on-primary); box-shadow:inset 0 0 0 2px var(--bg), inset 0 0 0 3px var(--gold); }
+.btn-primary:hover { background:var(--primary-h); }
+.btn-secondary { background:var(--surface); color:var(--primary); border-color:var(--border-strong); }
+.btn-text { background:none; color:var(--primary); min-height:44px; text-decoration:underline; text-underline-offset:4px; }
+.btn-ok { background:var(--success); color:#fff; min-height:56px; }
+:root[data-theme='dark'] .btn-ok { color:#10240F; }
+.btn small { font-weight:400; font-size:13px; display:block; opacity:.95; }
+.repeat-lbl { display:flex; flex-direction:column; align-items:center; line-height:1.2; }
+
+.list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.row { display:flex; align-items:center; gap:12px; min-height:72px; padding:10px 14px 10px 10px; background:var(--surface); border:1px solid var(--line); border-radius:14px; color:inherit; text-decoration:none; }
+.row .tile { width:52px; height:52px; border-radius:12px; background:var(--sunken); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex:none; }
+.row .tile .ic { width:40px; height:40px; }
+.row .grow { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.row .name { font-weight:700; font-size:16px; line-height:1.25; }
+.row .sub { font-size:14px; color:var(--text-2); }
+.progress { height:8px; background:var(--sunken); border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+.progress > span { display:block; height:100%; background:var(--primary); }
+.chip-ok { display:inline-flex; gap:4px; align-items:center; padding:2px 10px; border-radius:999px; background:var(--success-soft); color:var(--success); font-weight:700; font-size:13px; white-space:nowrap; }
+.chev { color:var(--text-2); font-size:22px; }
+
+.tabbar { display:flex; border-top:3px double var(--gold); background:var(--surface); margin-top:auto; }
+.tab { flex:1; min-height:60px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:13px; color:var(--text-2); text-decoration:none; }
+.tab svg { width:24px; height:24px; }
+.tab .hy-l { font:700 20px/24px var(--font-hy); }
+.tab[aria-current='page'] { color:var(--primary); font-weight:700; background:var(--primary-soft); }
+
+/* карточка */
+.session-top { display:flex; align-items:center; gap:8px; min-height:56px; padding:0 8px; }
+.session-top .count { flex:1; text-align:center; font-size:14px; color:var(--text-2); }
+.icon-btn { min-width:44px; min-height:44px; border:0; background:none; border-radius:12px; font-size:24px; color:var(--primary); cursor:pointer; }
+.word-card { position:relative; flex:1; min-height:340px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:28px 14px; background:var(--surface); border:1px solid var(--line); border-radius:20px; overflow:hidden; }
+.word-card::before { content:''; position:absolute; inset:8px; border:1px solid var(--gold); border-radius:14px; pointer-events:none; }
+.word-card .wm { position:absolute; width:260px; height:260px; right:-60px; bottom:-60px; color:var(--gold); opacity:.14; pointer-events:none; --eye:var(--surface); }
+.word-card > *:not(.wm) { position:relative; }
+.hy-hero { font:700 28px/1.3 var(--font-hy); color:var(--primary); word-break:keep-all; max-width:100%; }
+.translit { font-size:20px; color:var(--text-2); letter-spacing:.01em; }
+.sound { min-width:56px; min-height:56px; border-radius:999px; border:2px solid var(--border-strong); background:var(--surface); color:var(--primary); font-size:22px; cursor:pointer; }
+.hint { font-size:14px; color:var(--text-2); }
+.bar { display:flex; flex-direction:column; gap:8px; padding:12px 16px 16px; background:var(--surface); border-top:1px solid var(--line); }
+.dots { display:flex; gap:4px; justify-content:center; }
+.dots i { width:22px; height:6px; border-radius:3px; background:var(--sunken); border:1px solid var(--line); }
+.dots i.on { background:var(--primary); border-color:var(--primary); }
+
+/* тема выучена */
+.win { flex:1; display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 20px 16px; text-align:center; position:relative; overflow:hidden; }
+.win .bird { width:150px; height:150px; color:var(--primary); --eye:var(--bg); position:relative; }
+.win h2 { font:700 28px/1.2 var(--font-head); position:relative; }
+.win .frame { position:relative; padding:12px; }
+.win .rays { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.win-stats { display:flex; gap:10px; width:100%; position:relative; }
+.win-stats .card { flex:1; padding:10px; text-align:center; }
+.win-stats b { font:700 26px/1.1 var(--font-head); display:block; color:var(--primary); }
+.win-stats span { font-size:13px; color:var(--text-2); }
+.win .grown { display:flex; align-items:flex-end; gap:6px; justify-content:center; position:relative; }
+.win .actions { width:100%; display:flex; flex-direction:column; gap:8px; margin-top:auto; position:relative; }
+
+/* мудборд-детали */
+.band { height:48px; border-radius:10px; background:var(--hdr-bg); border-bottom:3px double var(--gold); overflow:hidden; }
+.band svg { width:100%; height:100%; display:block; }
+.bird-big { width:140px; height:140px; color:var(--primary); --eye:var(--surface); }
+.alpha-head { display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 14px; }
+.alpha-head .bird { width:64px; height:64px; color:var(--primary); --eye:var(--surface); flex:none; }
+.alpha-head h3 { font:700 24px/1.2 var(--font-head); }
+.type-sample .a { font:700 44px/1.25 var(--font-hy); color:var(--primary); }
+.type-sample .b { font:700 24px/1.3 var(--font-head); }
+
+@media (prefers-reduced-motion:no-preference) { .btn,.row { transition:background-color .15s; } }
+</style>
+</head>
+<body>
+<!-- Определения: птицеписное Ա, аревахач, хачкар, иллюстрации тем -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="arev" width="28" height="28" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#E0B95A" stroke-width="1.2" opacity=".5">
+        <rect x="8" y="8" width="12" height="12"/>
+        <rect x="8" y="8" width="12" height="12" transform="rotate(45 14 14)"/>
+        <circle cx="14" cy="14" r="2.5"/>
+      </g>
+    </pattern>
+
+    <!-- Птицепись: Ա как птица. Левая «рука» = шея и голова с клювом, чаша = тело, правая «рука» = хвост-веер, хвостик буквы = лапка -->
+    <symbol id="bird-a" viewBox="0 0 100 100">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke-width="8" d="M30 34V58Q30 84 52 84Q74 84 74 58V26"/>
+        <path stroke-width="5" d="M74 26L63 8M74 26L75 4M74 26L87 9"/>
+        <path stroke-width="4" d="M74 60Q80 80 95 83M95 83L91 92"/>
+        <path stroke-width="3" d="M42 66Q52 52 62 66M45 72Q52 62 59 72"/>
+        <path stroke-width="3" d="M30 13Q27 4 36 4M36 13Q39 5 47 8"/>
+      </g>
+      <circle cx="30" cy="25" r="11.5" fill="currentColor"/>
+      <path d="M20 21L4 27L20 32Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="33" cy="22" r="2.8" style="fill:var(--eye)"/>
+      <circle cx="63" cy="8" r="3" fill="currentColor"/><circle cx="75" cy="4" r="3" fill="currentColor"/><circle cx="87" cy="9" r="3" fill="currentColor"/>
+      <circle cx="52" cy="84" r="2.6" style="fill:var(--eye)"/>
+    </symbol>
+
+    <!-- Хачкар-крест с трилистными концами -->
+    <symbol id="khach" viewBox="0 0 40 40">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 8V32M8 20H32"/>
+        <path d="M20 8Q15 8 15 4M20 8Q25 8 25 4M20 32Q15 32 15 36M20 32Q25 32 25 36M8 20Q8 15 4 15M8 20Q8 25 4 25M32 20Q32 15 36 15M32 20Q32 25 36 25"/>
+        <path d="M20 14L26 20L20 26L14 20Z"/>
+      </g>
+    </symbol>
+
+    <symbol id="pom" viewBox="0 0 40 40">
+      <path d="M9 14L11 6L16 11L20 4L24 11L29 6L31 14Z" fill="#E2B857" stroke="#3B2418" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="20" cy="24" r="14" fill="#A82238" stroke="#3B2418" stroke-width="1.2"/>
+      <path d="M11 22Q12 15 18 14" fill="none" stroke="#F1A5B0" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- иллюстрации тем 32x32 -->
+    <symbol id="i-ararat" viewBox="0 0 32 32">
+      <path class="f1" d="M1 27L11 6L18 20L24 12L31 27Z"/>
+      <path class="f2" d="M11 6L7.5 13L10 12L11.5 14.5L13.8 11.6Z"/>
+      <path class="f2" d="M24 12L21.5 16L24 15.2L26 16.5Z"/>
+      <path class="st" d="M0 29H32"/>
+    </symbol>
+    <symbol id="i-pom" viewBox="0 0 32 32">
+      <path class="f2" d="M9 10L10 5L14 8L16 4L18 8L22 5L23 10Z"/>
+      <circle class="f1" cx="16" cy="19" r="10.5"/>
+      <path class="sw2" d="M9.5 18Q10.5 13 14.5 12.2"/>
+    </symbol>
+    <symbol id="i-lavash" viewBox="0 0 32 32">
+      <path class="f1" d="M2 11Q16 4 30 11L28 24Q16 30 4 24Z"/>
+      <path class="sw2" d="M8 14Q16 11 24 14M8 19Q16 16 24 19"/>
+      <circle class="f2" cx="11" cy="22" r="1.1"/><circle class="f2" cx="20" cy="23" r="1.1"/>
+    </symbol>
+    <symbol id="i-taxi" viewBox="0 0 32 32">
+      <rect class="f2" x="12" y="5" width="8" height="5" rx="1.2"/>
+      <path class="f1" d="M3 22L5.5 14Q6.5 11 9.5 11H22.5Q25.5 11 26.5 14L29 22V25H3Z"/>
+      <path class="sw2" d="M9 14H23"/>
+      <circle class="f2" cx="9" cy="25" r="3.2"/><circle class="f2" cx="23" cy="25" r="3.2"/>
+    </symbol>
+    <symbol id="i-jezve" viewBox="0 0 32 32">
+      <path class="f1" d="M9 27L12 13H20L23 27Z"/>
+      <path class="f1" d="M13 13L14 6H18L19 13Z"/>
+      <path class="f2" d="M13 6L10 3L15 4Z"/>
+      <path class="st" d="M23 15Q30 16 27 25"/>
+      <path class="sw2" d="M12 20H21"/>
+    </symbol>
+    <symbol id="i-house" viewBox="0 0 32 32">
+      <path class="f1" d="M4 16L16 5L28 16V27H4Z"/>
+      <rect class="f2" x="13" y="19" width="6" height="8" rx="3"/>
+      <path class="st" d="M2 16L16 4L30 16"/>
+    </symbol>
+    <symbol id="i-num" viewBox="0 0 32 32">
+      <rect class="f1" x="3" y="5" width="26" height="22" rx="5"/>
+      <path class="sw2" d="M9 12L11.5 10V22M16 13Q16 10 19 10Q22 10 22 13Q22 16 16 22H23"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page">
+<header>
+  <div>
+    <h1>Вариант A «Рукопись»</h1>
+    <p class="muted">Пергамент, гранат и золото, птицепись как главный герой. Настроение: тёплое, неспешное, «книга».</p>
+  </div>
+  <button class="theme-switch" type="button" id="ts">Тёмная тема</button>
+</header>
+
+<h2 class="sec">Мини-мудборд</h2>
+<div class="swatches" aria-label="Палитра">
+  <div class="sw"><i style="background:#F4E7CB"></i><div><b>Пергамент</b>#F4E7CB<br>фон (светлая)</div></div>
+  <div class="sw"><i style="background:#FFF9EA"></i><div><b>Лист</b>#FFF9EA<br>карточки</div></div>
+  <div class="sw"><i style="background:#8C1C2F"></i><div><b>Гранат</b>#8C1C2F<br>основной, 8.6:1 на листе</div></div>
+  <div class="sw"><i style="background:#B58A2A"></i><div><b>Золото</b>#B58A2A<br>только декор и рамки</div></div>
+  <div class="sw"><i style="background:#233F73"></i><div><b>Арарат</b>#233F73<br>ссылки, фокус, 9:1</div></div>
+  <div class="sw"><i style="background:#C8641F"></i><div><b>Абрикос</b>#C8641F<br>акцент, иллюстрации</div></div>
+  <div class="sw"><i style="background:#2E6B3B"></i><div><b>Верно</b>#2E6B3B<br>плюс галочка и текст</div></div>
+  <div class="sw"><i style="background:#1D1311"></i><div><b>Тёмная: ночной переплёт</b>#1D1311<br>акцент #E4707F, золото #E2B857</div></div>
+</div>
+
+<div class="board" style="margin-top:16px">
+  <div class="card type-sample">
+    <h3 class="head" style="font-size:18px;margin-bottom:8px">Шрифты</h3>
+    <div class="a hy" lang="hy">Հայերեն</div>
+    <div class="b head">Заголовки: Noto Serif Armenian</div>
+    <p class="muted" style="margin-top:6px">Интерфейс: системный sans-serif, армянский: Noto Serif Armenian (запасной Noto Sans Armenian, в карточках 28 px и выше жирным).</p>
+  </div>
+  <div class="card">
+    <h3 class="head" style="font-size:18px;margin-bottom:8px">Орнамент: аревахач и хачкар</h3>
+    <div class="band"><svg aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg></div>
+    <div style="display:flex;gap:16px;align-items:center;margin-top:10px;color:var(--gold)">
+      <svg width="56" height="56" aria-hidden="true"><use href="#khach"/></svg>
+      <svg width="40" height="40" aria-hidden="true" style="color:var(--primary)"><use href="#khach"/></svg>
+      <span class="muted" style="font-size:14px">Шапка, пустые состояния, рамка карточки слова</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3 class="head" style="font-size:18px;margin-bottom:8px">Птицепись: Ա</h3>
+    <div style="display:flex;gap:16px;align-items:center">
+      <svg class="bird-big" viewBox="-4 -6 108 106" aria-label="Буква Ա в виде птицы"><use href="#bird-a" x="0" y="0" width="100" height="100"/></svg>
+      <p class="muted" style="font-size:14px">Голова с клювом слева, чаша-тело, хвост-веер справа и лапка вместо хвостика буквы.</p>
+    </div>
+    <div class="alpha-head" style="margin-top:10px">
+      <svg class="bird" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-a" width="100" height="100"/></svg>
+      <div><h3>Алфавит</h3><span class="muted" style="font-size:14px">38 букв · птицепись в заголовке</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 class="head" style="font-size:18px;margin-bottom:8px">Иллюстрации тем</h3>
+    <div class="ic-grid">
+      <figure><svg class="ic ic-ararat" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-ararat"/></svg>Приветствия</figure>
+      <figure><svg class="ic ic-pom" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-pom"/></svg>Гранат</figure>
+      <figure><svg class="ic ic-lavash" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-lavash"/></svg>Лаваш</figure>
+      <figure><svg class="ic ic-taxi" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-taxi"/></svg>Такси</figure>
+      <figure><svg class="ic ic-jezve" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-jezve"/></svg>Кафе</figure>
+      <figure><svg class="ic ic-house" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-house"/></svg>Жильё</figure>
+      <figure><svg class="ic ic-num" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-num"/></svg>Числа</figure>
+    </div>
+  </div>
+</div>
+
+<h2 class="sec">Экраны</h2>
+<div class="phones">
+
+<!-- Главная -->
+<figure>
+<figcaption>Главная</figcaption>
+<div class="phone">
+  <div class="hdr">
+    <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
+    <svg class="logo" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-a" width="100" height="100"/></svg>
+    <div><div class="brand">Hayeren</div><div class="brand-hy" lang="hy">Հայերեն</div></div>
+  </div>
+  <div class="screen">
+    <div class="growth" role="group" aria-label="Серия дней: 3 дня подряд, гранат растёт">
+      <div class="trees" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="40" height="40" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="54" height="54" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="54" height="54" viewBox="0 0 40 40" opacity=".35"><circle cx="20" cy="24" r="13" fill="none" stroke="#8A6A3A" stroke-width="2" stroke-dasharray="4 3"/></svg>
+      </div>
+      <div><b>3 дня подряд</b><span>Гранат растёт. До спелого ещё 2 дня</span></div>
+    </div>
+
+    <button class="btn btn-primary" type="button">
+      <span class="repeat-lbl">Повторить (7)<small>слова, которые пора освежить</small></span>
+    </button>
+
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-ararat" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-ararat"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="sub">выучено 6 из 15</span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="6" aria-label="Выучено 6 из 15"><span style="width:40%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-num" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-num"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="sub">выучено 4 из 15</span><span class="progress"><span style="width:27%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-pom" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-pom"/></svg></span><span class="grow"><span class="name">Магазин и рынок</span><span class="sub">выучено 0 из 14</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-taxi" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-taxi"/></svg></span><span class="grow"><span class="name">Транспорт и такси</span><span class="sub">выучено 12 из 12</span></span><span class="chip-ok">✓ Выучена</span></a></li>
+    </ul>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#"><span class="hy-l hy" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<!-- Карточка слова -->
+<figure>
+<figcaption>Карточка слова (лицевая сторона)</figcaption>
+<div class="phone">
+  <div class="session-top">
+    <button class="icon-btn" type="button" aria-label="Закрыть сессию">×</button>
+    <span class="count">Слово 3 из 10</span>
+    <span style="min-width:44px"></span>
+  </div>
+  <div class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  <div class="screen">
+    <div class="word-card">
+      <svg class="wm" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-a" width="100" height="100"/></svg>
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true" style="color:var(--gold)"><use href="#khach"/></svg>
+      <div class="hy-hero" lang="hy">շնորհակալություն</div>
+      <div class="translit">shnorhakalut’yun</div>
+      <button class="sound" type="button" aria-label="Прослушать слово">♪</button>
+      <p class="hint">Вспомни перевод, затем проверь себя</p>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="btn btn-primary" type="button">Показать перевод</button>
+    <button class="btn btn-text" type="button">Пропустить</button>
+  </div>
+</div>
+</figure>
+
+<!-- Тема выучена -->
+<figure>
+<figcaption>Тема выучена</figcaption>
+<div class="phone">
+  <div class="win">
+    <svg class="rays" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)" opacity=".5" style="mix-blend-mode:normal"/></svg>
+    <div class="frame">
+      <svg class="bird" viewBox="-4 -6 108 106" aria-hidden="true"><use href="#bird-a" width="100" height="100"/></svg>
+    </div>
+    <h2>Тема выучена!</h2>
+    <p class="muted" style="position:relative">Транспорт и такси: все 12 слов. Շատ լավ! <span class="muted">(Очень хорошо!)</span></p>
+    <div class="grown" aria-hidden="true">
+      <svg width="40" height="40" viewBox="0 0 40 40"><use href="#pom"/></svg>
+      <svg width="56" height="56" viewBox="0 0 40 40"><use href="#pom"/></svg>
+      <svg width="72" height="72" viewBox="0 0 40 40"><use href="#pom"/></svg>
+    </div>
+    <div class="win-stats">
+      <div class="card"><b>+12</b><span>слов выучено</span></div>
+      <div class="card"><b>24</b><span>из 101 всего</span></div>
+      <div class="card"><b>4</b><span>дня подряд</span></div>
+    </div>
+    <div style="color:var(--gold);position:relative"><svg width="48" height="48" aria-hidden="true"><use href="#khach"/></svg></div>
+    <div class="actions">
+      <button class="btn btn-primary" type="button">Следующая тема: Кафе и еда</button>
+      <button class="btn btn-text" type="button">На главную</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+</div>
+</div>
+<script>
+(function(){
+  var r=document.documentElement, b=document.getElementById('ts');
+  if(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches){r.dataset.theme='dark';}
+  function sync(){b.textContent=r.dataset.theme==='dark'?'Светлая тема':'Тёмная тема';}
+  b.addEventListener('click',function(){r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';sync();});
+  sync();
+})();
+</script>
+</body>
+</html>

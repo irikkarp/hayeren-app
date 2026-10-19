@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Кафе и еда: лаваш">
+  <title>Тема food: лаваш, тонкий лист с загнутым углом</title>
+  <!-- Цвета: CSS-переменные ic1, ic2, ink (имена с двумя дефисами в начале), запасные значения ниже. -->
+  <path d="M3 10Q13 5.5 22 8L29 14.5Q29.8 20 27.5 24Q15 28.5 4.5 24.5Q2 17 3 10Z" style="fill:var(--ic1,#D9A15B);stroke:var(--ink,#3B2418);stroke-width:1.1;stroke-linejoin:round"/>
+  <path d="M22 8L29 14.5Q25 15.5 21 14Q21.5 10.5 22 8Z" style="fill:var(--ic2,#EBC283);stroke:var(--ink,#3B2418);stroke-width:1.1;stroke-linejoin:round"/>
+  <path d="M7 17Q12 14.8 17 16.5" style="fill:none;stroke:var(--ink,#3B2418);stroke-width:1.4;stroke-linecap:round"/>
+  <g style="fill:var(--ink,#3B2418);opacity:.55">
+    <circle cx="9" cy="21" r="1"/><circle cx="13.5" cy="20" r="0.9"/><circle cx="19" cy="21.5" r="1"/><circle cx="24" cy="21" r="0.9"/><circle cx="10.5" cy="12.5" r="0.9"/>
+  </g>
+</svg>

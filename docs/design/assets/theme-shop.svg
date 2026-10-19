@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Магазин и рынок: корзина">
+  <title>Тема shop: корзина с плодами</title>
+  <!-- Цвета: CSS-переменные ic1, ic2, ink (имена с двумя дефисами в начале), запасные значения ниже. -->
+  <path d="M9.5 14Q9.5 4.5 16 4.5Q22.5 4.5 22.5 14" style="fill:none;stroke:var(--ink,#3B2418);stroke-width:2;stroke-linecap:round"/>
+  <g style="fill:var(--ic2,#E2B857);stroke:var(--ink,#3B2418);stroke-width:1.1">
+    <circle cx="12.5" cy="12.5" r="3.6"/><circle cx="19.5" cy="12" r="3.6"/>
+  </g>
+  <path d="M4 14H28L25 26.5Q16 28.5 7 26.5Z" style="fill:var(--ic1,#C8641F);stroke:var(--ink,#3B2418);stroke-width:1.1;stroke-linejoin:round"/>
+  <path d="M5.5 19H26.5M6.5 23H25.5M11 15.5L12 26.5M16 15.5V27.5M21 15.5L20 26.5" style="fill:none;stroke:var(--ic2,#E2B857);stroke-width:1.6;stroke-linecap:round"/>
+</svg>

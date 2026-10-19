@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Hayeren">
+  <title>Hayeren: птицеписное Ա на гранатовом фоне</title>
+  <!-- Фон залит до краёв (нужен для maskable). Цвет совпадает с токеном header-bg светлой темы: #7E1727. -->
+  <rect width="512" height="512" fill="#7E1727"/>
+  <!-- Единственная тонкая золотая рамка. Это декор: при круглой маске по краям она может обрезаться, это нормально. -->
+  <rect x="26" y="26" width="460" height="460" rx="44" fill="none" stroke="#E2B857" stroke-width="6"/>
+  <!-- Птицепись Ա, упрощённая для малых размеров: без перьев и узора на теле, толстые штрихи.
+       Рисунок центрирован и целиком лежит внутри круга радиусом 205 px от центра (безопасная зона 80%). -->
+  <g transform="translate(112 112) scale(3.2)" fill="none" stroke="#F2D58A" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="11" d="M30 34V58Q30 84 52 84Q74 84 74 58V26"/>
+    <path stroke-width="8" d="M74 26L62 6M74 26L75 2M74 26L88 8"/>
+    <path stroke-width="6" d="M74 60Q80 78 92 80"/>
+    <circle cx="30" cy="25" r="14" fill="#F2D58A" stroke="none"/>
+    <path d="M17 20L-2 27L17 34Z" fill="#F2D58A" stroke-width="2"/>
+    <circle cx="34" cy="22" r="3.6" fill="#7E1727" stroke="none"/>
+    <circle cx="62" cy="6" r="4.5" fill="#F2D58A" stroke="none"/>
+    <circle cx="75" cy="2" r="4.5" fill="#F2D58A" stroke="none"/>
+    <circle cx="88" cy="8" r="4.5" fill="#F2D58A" stroke="none"/>
+  </g>
+</svg>

@@ -1,0 +1,85 @@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="arev" width="28" height="28" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#E0B95A" stroke-width="1.2">
+        <rect x="8" y="8" width="12" height="12"/>
+        <rect x="8" y="8" width="12" height="12" transform="rotate(45 14 14)"/>
+        <circle cx="14" cy="14" r="2.5"/>
+      </g>
+    </pattern>
+
+    <!-- Птицепись: Ա как птица. Левая «рука» буквы: шея, голова с клювом. Чаша: тело. Правая «рука»: хвост-веер. Хвостик буквы: лапка. -->
+    <symbol id="bird-a" viewBox="-4 -6 108 106">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke-width="8" d="M30 34V58Q30 84 52 84Q74 84 74 58V26"/>
+        <path stroke-width="5" d="M74 26L63 8M74 26L75 4M74 26L87 9"/>
+        <path stroke-width="4" d="M74 60Q80 80 95 83M95 83L91 92"/>
+        <path stroke-width="3" d="M42 66Q52 52 62 66M45 72Q52 62 59 72"/>
+        <path stroke-width="3" d="M30 13Q27 4 36 4M36 13Q39 5 47 8"/>
+      </g>
+      <circle cx="30" cy="25" r="11.5" fill="currentColor"/>
+      <path d="M20 21L4 27L20 32Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="33" cy="22" r="2.8" style="fill:var(--eye)"/>
+      <circle cx="63" cy="8" r="3" fill="currentColor"/><circle cx="75" cy="4" r="3" fill="currentColor"/><circle cx="87" cy="9" r="3" fill="currentColor"/>
+      <circle cx="52" cy="84" r="2.6" style="fill:var(--eye)"/>
+    </symbol>
+
+    <!-- Хачкар-крест с трилистными концами -->
+    <symbol id="khach" viewBox="0 0 40 40">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 8V32M8 20H32"/>
+        <path d="M20 8Q15 8 15 4M20 8Q25 8 25 4M20 32Q15 32 15 36M20 32Q25 32 25 36M8 20Q8 15 4 15M8 20Q8 25 4 25M32 20Q32 15 36 15M32 20Q32 25 36 25"/>
+        <path d="M20 14L26 20L20 26L14 20Z"/>
+      </g>
+    </symbol>
+
+    <!-- Гранат (серия дней) -->
+    <symbol id="pom" viewBox="0 0 40 40">
+      <path d="M9 14L11 6L16 11L20 4L24 11L29 6L31 14Z" style="fill:var(--crown);stroke:var(--pom-ink);stroke-width:1.2;stroke-linejoin:round"/>
+      <circle cx="20" cy="24" r="14" style="fill:var(--pom-fill);stroke:var(--pom-ink);stroke-width:1.2"/>
+      <path d="M11 22Q12 15 18 14" fill="none" stroke="#F1A5B0" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Значки тем 32x32 (классы f1, f2, st, sw2, dot описаны в style.css без предков) -->
+    <symbol id="i-greetings" viewBox="0 0 32 32">
+      <path class="f1" d="M1 27L11 6L18 20L24 12L31 27Z"/>
+      <path class="f2" d="M11 6L7.5 13L10 12L11.5 14.5L13.8 11.6Z"/>
+      <path class="f2" d="M24 12L21.5 16L24 15.2L26 16.5Z"/>
+      <path class="st" d="M0 29H32"/>
+    </symbol>
+    <!-- Числа: счёты -->
+    <symbol id="i-numbers" viewBox="0 0 32 32">
+      <rect class="f2" x="3" y="5" width="26" height="22" rx="3"/>
+      <path class="st" d="M6 11H26M6 16H26M6 21H26"/>
+      <circle class="f1" cx="9" cy="11" r="2.1"/><circle class="f1" cx="13.6" cy="11" r="2.1"/><circle class="f1" cx="23" cy="11" r="2.1"/>
+      <circle class="f1" cx="9" cy="16" r="2.1"/><circle class="f1" cx="19" cy="16" r="2.1"/><circle class="f1" cx="23.4" cy="16" r="2.1"/>
+      <circle class="f1" cx="9" cy="21" r="2.1"/><circle class="f1" cx="13.6" cy="21" r="2.1"/><circle class="f1" cx="18.2" cy="21" r="2.1"/>
+    </symbol>
+    <!-- Магазин и рынок: корзина с плодами -->
+    <symbol id="i-shop" viewBox="0 0 32 32">
+      <path class="st" style="stroke-width:2" d="M9.5 14Q9.5 4.5 16 4.5Q22.5 4.5 22.5 14"/>
+      <circle class="f2" cx="12.5" cy="12.5" r="3.6"/>
+      <circle class="f2" cx="19.5" cy="12" r="3.6"/>
+      <path class="f1" d="M4 14H28L25 26.5Q16 28.5 7 26.5Z"/>
+      <path class="sw2" d="M5.5 19H26.5M6.5 23H25.5M11 15.5L12 26.5M16 15.5V27.5M21 15.5L20 26.5"/>
+    </symbol>
+    <symbol id="i-transport" viewBox="0 0 32 32">
+      <rect class="f2" x="12" y="5" width="8" height="5" rx="1.2"/>
+      <path class="f1" d="M3 22L5.5 14Q6.5 11 9.5 11H22.5Q25.5 11 26.5 14L29 22V25H3Z"/>
+      <path class="sw2" d="M9 14H23"/>
+      <circle class="f2" cx="9" cy="25" r="3.2"/><circle class="f2" cx="23" cy="25" r="3.2"/>
+    </symbol>
+    <symbol id="i-housing" viewBox="0 0 32 32">
+      <path class="f1" d="M4 16L16 5L28 16V27H4Z"/>
+      <rect class="f2" x="13" y="19" width="6" height="8" rx="3"/>
+      <path class="st" d="M2 16L16 4L30 16"/>
+    </symbol>
+    <!-- Кафе и еда: лаваш, тонкий лист с загнутым углом -->
+    <symbol id="i-food" viewBox="0 0 32 32">
+      <path class="f1" d="M3 10Q13 5.5 22 8L29 14.5Q29.8 20 27.5 24Q15 28.5 4.5 24.5Q2 17 3 10Z"/>
+      <path class="f2" d="M22 8L29 14.5Q25 15.5 21 14Q21.5 10.5 22 8Z"/>
+      <path class="st" d="M7 17Q12 14.8 17 16.5"/>
+      <circle class="dot" cx="9" cy="21" r="1"/><circle class="dot" cx="13.5" cy="20" r="0.9"/><circle class="dot" cx="19" cy="21.5" r="1"/><circle class="dot" cx="24" cy="21" r="0.9"/><circle class="dot" cx="10.5" cy="12.5" r="0.9"/>
+    </symbol>
+  </defs>
+</svg>

@@ -1,0 +1,346 @@
+/* Каркас приложения: колонка, панели, навигация, тосты и диалоги (ui-kit, разделы 4–6). */
+
+#root {
+  min-height: 100dvh;
+}
+
+/* На десктопе центрированная колонка 560px, фон за колонкой sunken. */
+.app-root {
+  max-width: var(--column);
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.screen {
+  flex: 1;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.splash {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 1.75rem/1.2 var(--font-head);
+  color: var(--color-text-2);
+}
+
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: 0 var(--space-2);
+  background: var(--color-bg);
+  border-bottom: 3px double var(--color-divider);
+}
+.appbar h1 {
+  flex: 1;
+  font: 700 1.1875rem/1.3 var(--font-head);
+  padding: 0 var(--space-2);
+}
+
+.tabbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  margin-top: auto;
+  border-top: 3px double var(--color-gold);
+  background: var(--color-surface);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tab {
+  flex: 1;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: var(--color-text-2);
+  text-decoration: none;
+}
+.tab svg {
+  width: 24px;
+  height: 24px;
+}
+.tab .hy-l {
+  font: 700 1.25rem/24px var(--font-hy);
+}
+.tab[aria-current='page'] {
+  color: var(--color-primary);
+  font-weight: 700;
+  background: var(--color-primary-soft);
+  box-shadow: inset 0 3px 0 var(--color-primary);
+}
+
+.stickybar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-divider);
+}
+/* Нижняя панель сессии: одна высота на лицевой и обратной стороне, раскладка не прыгает. */
+.stickybar.is-session {
+  min-height: 92px;
+  justify-content: center;
+}
+
+.session-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  min-height: 56px;
+}
+.session-top .count {
+  flex: 1;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-2);
+}
+.icon-btn {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0 var(--space-2);
+}
+.icon-btn:hover {
+  background: var(--color-primary-soft);
+}
+
+/* Баннер B1 закреплён вверху и не закрывается. */
+.banner-top {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  border-radius: 0;
+  border-width: 0 0 1px;
+  border-left-width: 4px;
+}
+
+/* Тосты: над нижней панелью, не перекрывают кнопки ответа. */
+.toast-host {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(108px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--space-3);
+  pointer-events: none;
+  z-index: 20;
+}
+.toast {
+  pointer-events: none;
+  width: 100%;
+  max-width: calc(var(--column) - 24px);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Диалог подтверждения: нижний лист на телефоне, окно по центру на десктопе. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--color-overlay);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.scrim .sheet {
+  max-width: var(--column);
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+}
+@media (min-width: 720px) {
+  .scrim {
+    align-items: center;
+  }
+  .scrim .sheet {
+    max-width: 420px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-divider);
+    border-top: 3px double var(--color-gold);
+    padding-bottom: var(--space-4);
+  }
+}
+
+/* Настройки: радиокнопки режима. */
+.radio-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 56px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.radio-card:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.radio-card:has(input:focus-visible) {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.radio-card input {
+  width: 24px;
+  height: 24px;
+  margin: 2px 0 0;
+  flex: none;
+  accent-color: var(--color-primary);
+}
+.radio-card .name {
+  font-weight: 700;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.kv {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* Алфавит */
+.alpha-table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.alpha-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.alpha-table {
+  table-layout: fixed;
+}
+.alpha-table th,
+.alpha-table td {
+  padding: 8px 6px;
+  overflow-wrap: break-word;
+}
+.alpha-table th:nth-child(1) {
+  width: 26%;
+}
+.alpha-table th:nth-child(2) {
+  width: 37%;
+}
+
+.alpha-table .letters {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  white-space: nowrap;
+}
+.alpha-table .tr {
+  font-size: 1.1875rem;
+  font-weight: 700;
+}
+.disclosure {
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+}
+.disclosure summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.disclosure .body {
+  padding: 0 var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Сессия */
+.session-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
+}
+.word-card:focus {
+  outline: none;
+}
+.answer-focus:focus {
+  outline: none;
+}
+.chev {
+  color: var(--color-text-2);
+  font-size: 1.375rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* «Тема выучена»: узор на всю высоту экрана. */
+.win {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.summary h1:focus {
+  outline: none;
+}
+
+@media (max-width: 420px) {
+  .alpha-table .letter-xl {
+    font-size: 2rem;
+  }
+  .alpha-table .letters {
+    gap: 8px;
+  }
+}
