@@ -5,6 +5,8 @@ interface Toast {
   id: number
   message: string
   durationMs: number
+  /** Адрес в момент показа: при любой смене маршрута тост закрывается. */
+  hash: string
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -15,6 +17,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       id: (prev?.id ?? 0) + 1,
       message,
       durationMs: options.durationMs ?? 4000,
+      hash: window.location.hash,
     }))
   }, [])
 
@@ -24,6 +27,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     if (!toast) return
     const timer = window.setTimeout(() => setToast(null), toast.durationMs)
     return () => window.clearTimeout(timer)
+  }, [toast])
+
+  useEffect(() => {
+    if (!toast) return
+    const onChange = () => {
+      if (window.location.hash !== toast.hash) setToast(null)
+    }
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
   }, [toast])
 
   const api = useMemo(() => ({ show, dismiss }), [show, dismiss])

@@ -4,6 +4,7 @@ import { toDateKey } from '../domain/dates'
 import type { SessionTarget } from '../domain/queue'
 import { dropMissing, isFinished, sessionStats, type Verdict } from '../domain/session'
 import { countDue, learnedCount } from '../domain/stats'
+import type { SaveFile } from '../platform/saveFile'
 import { MemoryRepository } from '../storage/memoryRepository'
 import type { Repository } from '../storage/repository'
 import { prog, userSet, userWord } from '../test/fixtures'
@@ -578,5 +579,80 @@ describe('31: обновление словаря (words.json version 2) при 
     expect(learnedCount(second.getCatalog(), second.getState().progress)).toBe(
       learnedCount(first.getCatalog(), first.getState().progress),
     )
+  })
+})
+
+describe('экспорт в CSV (этап 3, критерии 88–100)', () => {
+  async function withWords(saveFile: SaveFile) {
+    const repo = new MemoryRepository(true)
+    await repo.commitUserData({
+      sets: [userSet('s1', 10), userSet('s2', 20)],
+      words: [userWord('u-1', 's1', 11), userWord('u-2', 's1', 12), userWord('u-3', 's2', 21)],
+      deleteProgress: [],
+      now: 1,
+    })
+    const clock = new Date(2026, 9, 19, 10, 0)
+    const store = new AppStore({
+      openRepository: async () => repo,
+      content,
+      now: () => clock,
+      saveFile,
+    })
+    await store.start()
+    return { store, repo }
+  }
+
+  it('успех: файл передан, дата копии обновлена и сохранена; прогресс не сбрасывает её', async () => {
+    const saved: [string, string][] = []
+    const { store, repo } = await withWords(async (name, text) => {
+      saved.push([name, text])
+      return 'saved'
+    })
+    expect(store.getState().lastBackupAt).toBeNull()
+    const res = await store.exportWords()
+    expect(res.status).toBe('ok')
+    expect(saved).toHaveLength(1)
+    expect(saved[0][0]).toBe('hayeren-words-2026-10-19.csv')
+    const at = new Date(2026, 9, 19, 10, 0).getTime()
+    expect(store.getState().lastBackupAt).toBe(at)
+    await store.resetProgress()
+    expect((await repo.load()).lastBackupAt).toBe(at)
+  })
+
+  it('один набор: в файле только его слова', async () => {
+    let text = ''
+    const { store } = await withWords(async (_n, t) => {
+      text = t
+      return 'saved'
+    })
+    const res = await store.exportWords('s2')
+    expect(res.status === 'ok' && res.file.wordCount).toBe(1)
+    expect(text.match(/Набор s2/g)).toHaveLength(1)
+    expect(text).not.toContain('Набор s1')
+  })
+
+  it('ошибка сохранения: данные и дата не меняются; отмена «Поделиться» тоже', async () => {
+    const failing = await withWords(async () => {
+      throw new Error('boom')
+    })
+    expect((await failing.store.exportWords()).status).toBe('failed')
+    expect(failing.store.getState().lastBackupAt).toBeNull()
+    expect((await failing.repo.load()).lastBackupAt).toBeNull()
+    const cancelled = await withWords(async () => 'cancelled')
+    expect((await cancelled.store.exportWords()).status).toBe('cancelled')
+    expect(cancelled.store.getState().lastBackupAt).toBeNull()
+  })
+
+  it('нет слов: файл не создаётся (89)', async () => {
+    let calls = 0
+    const repo = new MemoryRepository(true)
+    const store = new AppStore({
+      openRepository: async () => repo,
+      content,
+      saveFile: async () => (calls++, 'saved'),
+    })
+    await store.start()
+    expect((await store.exportWords()).status).toBe('empty')
+    expect(calls).toBe(0)
   })
 })

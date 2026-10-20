@@ -176,6 +176,7 @@ test.describe('Все слова словаря на карточке', () => {
   }) => {
     // 88 слов x 3 прохода с замерами: под нагрузкой (параллельные воркеры) 30 с бывает мало.
     test.setTimeout(120_000)
+    test.slow()
     // Каждое слово ставим в долг и проходим общую сессию из 30 слов за раз.
     const progress = ALL_IDS.map((wordId) => ({ wordId, box: 2, dueDate: addDays(TODAY, -1) }))
     await openWith(page, { progress })

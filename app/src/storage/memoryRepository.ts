@@ -25,6 +25,7 @@ export class MemoryRepository implements Repository {
   private celebrations = new Map<string, CelebrationRec>()
   private userSets = new Map<string, UserSet>()
   private userWords = new Map<string, UserWord>()
+  private lastBackupAt: number | null = null
 
   readonly persistent: boolean
 
@@ -40,6 +41,7 @@ export class MemoryRepository implements Repository {
       celebrations: [...this.celebrations.values()].filter(isLive),
       userSets: [...this.userSets.values()].filter(isLive),
       userWords: [...this.userWords.values()].filter(isLive),
+      lastBackupAt: this.lastBackupAt,
     }
   }
 
@@ -88,5 +90,9 @@ export class MemoryRepository implements Repository {
       if (p && isLive(p))
         this.progress.set(id, { ...p, deletedAt: batch.now, updatedAt: batch.now })
     }
+  }
+
+  async putLastBackup(at: number): Promise<void> {
+    this.lastBackupAt = at
   }
 }

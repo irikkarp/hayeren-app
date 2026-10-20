@@ -16,6 +16,8 @@ export interface Snapshot {
   celebrations: CelebrationRec[]
   userSets: UserSet[]
   userWords: UserWord[]
+  /** Время последнего успешного экспорта (мс) или null. Хранится в `meta`, не сбрасывается с прогрессом. */
+  lastBackupAt: number | null
 }
 
 /** Всё, что меняется одним ответом: сохраняется атомарно. */
@@ -56,6 +58,8 @@ export interface Repository {
   putUserWords(words: UserWord[]): Promise<void>
   /** Свои наборы и слова: добавление, изменение, мягкое удаление. Всё или ничего. */
   commitUserData(batch: UserDataBatch): Promise<void>
+  /** Запоминает время последнего успешного экспорта (этап 3, критерий 98). */
+  putLastBackup(at: number): Promise<void>
 }
 
 export const isLive = <T extends { deletedAt: number | null }>(r: T): boolean => r.deletedAt == null

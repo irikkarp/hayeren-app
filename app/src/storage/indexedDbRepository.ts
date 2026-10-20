@@ -26,9 +26,10 @@ const STORES = {
   celebrations: 'topicId',
   userSets: 'id',
   userWords: 'id',
-  meta: 'key', // задел под этап 3 (дата последней резервной копии)
+  meta: 'key', // служебные значения: дата последней резервной копии (этап 3)
 } as const
 type StoreName = keyof typeof STORES
+const LAST_BACKUP_KEY = 'lastBackupAt'
 
 const request = <T>(req: IDBRequest<T>): Promise<T> =>
   new Promise((resolve, reject) => {
@@ -101,7 +102,25 @@ class IndexedDbRepository implements Repository {
       celebrations: await this.all<CelebrationRec>('celebrations'),
       userSets: await this.all<UserSet>('userSets'),
       userWords: await this.all<UserWord>('userWords'),
+      lastBackupAt: await this.readLastBackup(),
     }
+  }
+
+  private async readLastBackup(): Promise<number | null> {
+    const rec = await request(
+      this.db.transaction('meta').objectStore('meta').get(LAST_BACKUP_KEY) as IDBRequest<
+        { key: string; value: number } | undefined
+      >,
+    )
+    return typeof rec?.value === 'number' ? rec.value : null
+  }
+
+  putLastBackup(at: number): Promise<void> {
+    return this.run(
+      ['meta'],
+      'readwrite',
+      (tx) => void tx.objectStore('meta').put({ key: LAST_BACKUP_KEY, value: at }),
+    )
   }
 
   putSettings(settings: Settings): Promise<void> {

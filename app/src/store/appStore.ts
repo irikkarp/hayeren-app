@@ -15,6 +15,7 @@ import type { Delimiter } from '../domain/csv'
 import type { Mapping } from '../domain/importFile'
 import type { ParseOutput } from '../domain/parsedRows'
 import type { SavePlan } from '../domain/preview'
+import { buildExportFile, type ExportFile } from '../domain/exportCsv'
 import { computeStreak } from '../domain/stats'
 import type {
   CelebrationMap,
@@ -27,6 +28,7 @@ import type {
   UserSet,
   UserWord,
 } from '../domain/types'
+import { saveTextFile, type SaveFile } from '../platform/saveFile'
 import { MemoryRepository } from '../storage/memoryRepository'
 import type { Repository, UserDataBatch } from '../storage/repository'
 import { editUserWord } from '../domain/userWords'
@@ -100,6 +102,8 @@ export interface AppState {
   celebrations: CelebrationMap
   userSets: UserSet[]
   userWords: UserWord[]
+  /** Время последнего успешного экспорта (мс) или null (критерий 98). */
+  lastBackupAt: number | null
   addFlow: AddFlow
   /** Последняя запись не удалась: данные живут только до конца сессии. */
   saveFailed: boolean
@@ -112,7 +116,13 @@ export interface AppDeps {
   openRepository: () => Promise<Repository>
   content: Content
   now?: () => Date
+  /** Сохранение файла экспорта; по умолчанию — загрузка через браузер (platform/saveFile). */
+  saveFile?: SaveFile
 }
+
+/** Итог экспорта (критерии 89, 99). */
+export type ExportResult =
+  { status: 'ok'; file: ExportFile } | { status: 'empty' | 'cancelled' | 'failed' }
 
 type Listener = () => void
 
@@ -142,6 +152,7 @@ export class AppStore {
       celebrations: {},
       userSets: [],
       userWords: [],
+      lastBackupAt: null,
       addFlow: emptyAddFlow(),
       saveFailed: false,
       lastResult: null,
@@ -207,6 +218,7 @@ export class AppStore {
         celebrations: Object.fromEntries(snap.celebrations.map((c) => [c.topicId, c])),
         userSets: snap.userSets,
         userWords: snap.userWords,
+        lastBackupAt: snap.lastBackupAt,
       })
     } catch {
       this.set({ phase: 'error' })
@@ -507,5 +519,30 @@ export class AppStore {
   async resetProgress(): Promise<void> {
     this.set({ progress: {}, days: {}, celebrations: {}, lastResult: null })
     await this.persist(() => this.repo.resetProgress(this.now().getTime()))
+  }
+
+  /**
+   * Экспорт своих слов в CSV (критерии 88–100): все наборы или один (`setId`). Вызывать прямо из
+   * обработчика нажатия: файл собирается и передаётся браузеру до первого `await` (нужно iOS).
+   * Дата последней копии обновляется только после успешной передачи файла.
+   */
+  async exportWords(setId?: string): Promise<ExportResult> {
+    const file = buildExportFile(
+      this.state.userSets,
+      this.state.userWords,
+      this.getNowDate(),
+      setId,
+    )
+    if (!file) return { status: 'empty' }
+    try {
+      const outcome = await (this.deps.saveFile ?? saveTextFile)(file.fileName, file.text)
+      if (outcome === 'cancelled') return { status: 'cancelled' }
+    } catch {
+      return { status: 'failed' }
+    }
+    const at = this.now().getTime()
+    this.set({ lastBackupAt: at })
+    await this.persist(() => this.repo.putLastBackup(at))
+    return { status: 'ok', file }
   }
 }

@@ -5,5 +5,5 @@
  */
 export const FEATURES = {
   userSets: true,
-  backup: false,
+  backup: true,
 } as const

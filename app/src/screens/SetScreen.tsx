@@ -5,7 +5,12 @@ import { setProgress } from '../domain/stats'
 import { STATUS_LABEL, wordStatus } from '../domain/userWords'
 import { navigate } from '../router'
 import { useAppState, useStore } from '../store/context'
+import { EXPORT_NOTE, SET_EMPTY } from '../domain/exportCsv'
+import { FEATURES } from '../features'
 import { ConfirmDialog } from '../ui/Dialog'
+import { ExportStatus } from '../ui/ExportStatus'
+import { useExport } from '../ui/useExport'
+import { ExportButton } from '../ui/ExportButton'
 import { Khachkar } from '../ui/Icons'
 import { Redirect } from '../ui/Redirect'
 import { RenameDialog } from '../ui/RenameDialog'
@@ -17,6 +22,7 @@ export function SetScreen({ setId }: { setId: string }) {
   const store = useStore()
   const { userSets, progress } = useAppState()
   const toast = useToast()
+  const exporter = useExport(setId)
   const [dialog, setDialog] = useState<'rename' | 'delete' | null>(null)
   const set = userSets.find((s) => s.id === setId)
   if (!set) return <Redirect to="/" />
@@ -76,6 +82,19 @@ export function SetScreen({ setId }: { setId: string }) {
           <button type="button" className="btn btn-text" onClick={() => setDialog('rename')}>
             Переименовать
           </button>
+          {FEATURES.backup && (
+            <>
+              <ExportStatus status={exporter.status} onClose={exporter.close} />
+              <ExportButton
+                label="Экспортировать набор"
+                exporter={exporter}
+                hasWords={p.total > 0}
+                emptyText={SET_EMPTY}
+                className="btn btn-text"
+              />
+              <p className="hint">{EXPORT_NOTE}</p>
+            </>
+          )}
           <button type="button" className="btn btn-danger-text" onClick={() => setDialog('delete')}>
             Удалить набор
           </button>

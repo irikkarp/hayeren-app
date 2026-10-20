@@ -3,7 +3,11 @@ import pkg from '../../package.json'
 import type { Mode } from '../domain/types'
 import { useAppState, useStore } from '../store/context'
 import { FEATURES } from '../features'
+import { EXPORT_NOTE, formatBackupDate, NOTHING_TO_EXPORT } from '../domain/exportCsv'
 import { ConfirmDialog } from '../ui/Dialog'
+import { ExportStatus } from '../ui/ExportStatus'
+import { useExport } from '../ui/useExport'
+import { ExportButton } from '../ui/ExportButton'
 import { StorageNote } from '../ui/StorageNote'
 import { useToast } from '../ui/toastContext'
 
@@ -22,6 +26,7 @@ export function Settings() {
   const state = useAppState()
   const toast = useToast()
   const [confirmReset, setConfirmReset] = useState(false)
+  const exporter = useExport()
   const mode = state.settings?.mode
 
   async function changeMode(next: Mode) {
@@ -65,12 +70,41 @@ export function Settings() {
           </div>
         </section>
 
+        {FEATURES.backup && (
+          <section className="stack" aria-labelledby="set-backup">
+            <h2 className="t-head" id="set-backup">
+              Резервная копия
+            </h2>
+            <ExportStatus status={exporter.status} onClose={exporter.close} />
+            <p className="t-small">{EXPORT_NOTE}</p>
+            <div className="stack" style={{ alignItems: 'flex-start' }}>
+              <ExportButton
+                label="Экспортировать все свои слова"
+                exporter={exporter}
+                hasWords={state.userWords.length > 0}
+                emptyText={NOTHING_TO_EXPORT}
+                className="btn btn-secondary"
+              />
+            </div>
+            <p className="t-small muted">
+              {state.lastBackupAt === null
+                ? 'Копия ещё не сохранялась'
+                : `Последняя копия: ${formatBackupDate(state.lastBackupAt)}`}
+            </p>
+          </section>
+        )}
+
         {FEATURES.userSets && (
           <section className="stack" aria-labelledby="set-storage">
             <h2 className="t-head" id="set-storage">
               Где хранятся данные
             </h2>
             <StorageNote />
+            {FEATURES.backup && (
+              <p className="muted t-small">
+                Загрузить копию обратно: «Добавить слова» → «Импорт из файла»
+              </p>
+            )}
           </section>
         )}
 

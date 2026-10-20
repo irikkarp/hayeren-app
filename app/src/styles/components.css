@@ -168,6 +168,9 @@
 .btn-text:hover {
   background: var(--color-primary-soft);
 }
+.btn-text[disabled] {
+  background: none;
+}
 .btn-success {
   background: var(--color-success);
   color: var(--color-on-success);

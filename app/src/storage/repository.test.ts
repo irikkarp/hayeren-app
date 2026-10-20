@@ -31,7 +31,15 @@ function contract(
         celebrations: [],
         userSets: [],
         userWords: [],
+        lastBackupAt: null,
       })
+    })
+
+    it('98: дата последней копии сохраняется, переживает перезапуск и не сбрасывается с прогрессом', async () => {
+      const { repo, reopen } = await make()
+      await repo.putLastBackup(1_700_000_000_000)
+      await repo.resetProgress(5)
+      expect((await (await reopen()).load()).lastBackupAt).toBe(1_700_000_000_000)
     })
 
     it('20: ответ сохраняется целиком и виден после «перезапуска»', async () => {
