@@ -2,7 +2,9 @@ import { useState } from 'react'
 import pkg from '../../package.json'
 import type { Mode } from '../domain/types'
 import { useAppState, useStore } from '../store/context'
+import { FEATURES } from '../features'
 import { ConfirmDialog } from '../ui/Dialog'
+import { StorageNote } from '../ui/StorageNote'
 import { useToast } from '../ui/toastContext'
 
 const MODES: { mode: Mode; name: string; hint: string }[] = [
@@ -62,6 +64,15 @@ export function Settings() {
             ))}
           </div>
         </section>
+
+        {FEATURES.userSets && (
+          <section className="stack" aria-labelledby="set-storage">
+            <h2 className="t-head" id="set-storage">
+              Где хранятся данные
+            </h2>
+            <StorageNote />
+          </section>
+        )}
 
         <section className="stack" aria-labelledby="set-progress">
           <h2 className="t-head" id="set-progress">

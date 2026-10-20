@@ -16,7 +16,25 @@ export interface SeedDay {
   newStarted?: number
   bonusNew?: number
 }
+export interface SeedUserSet {
+  id: string
+  title: string
+  createdAt: number
+}
+export interface SeedUserWord {
+  id: string
+  setId: string
+  hy: string
+  ru: string
+  translit?: string
+  translitAuto?: boolean
+  exampleHy?: string
+  exampleRu?: string
+  createdAt: number
+}
 export interface Seed {
+  userSets?: SeedUserSet[]
+  userWords?: SeedUserWord[]
   mode?: 'beginner' | 'reader'
   progress?: SeedProgress[]
   days?: SeedDay[]
@@ -34,7 +52,7 @@ export async function openWith(page: Page, seed: Seed = {}, time: Date = NOW) {
       r.onsuccess = () => res(r.result)
       r.onerror = () => rej(r.error)
     })
-    const stores = ['settings', 'progress', 'days', 'celebrations']
+    const stores = ['settings', 'progress', 'days', 'celebrations', 'userSets', 'userWords']
     const tx = db.transaction(stores, 'readwrite')
     const meta = { updatedAt: 1, deletedAt: null }
     tx.objectStore('settings').put({ id: 'settings', mode: s.mode ?? 'beginner', ...meta })
@@ -47,6 +65,20 @@ export async function openWith(page: Page, seed: Seed = {}, time: Date = NOW) {
         correct: 1,
         wrong: 0,
         ...meta,
+      })
+    }
+    for (const u of s.userSets ?? []) {
+      tx.objectStore('userSets').put({ ...u, ...meta, updatedAt: u.createdAt })
+    }
+    for (const w of s.userWords ?? []) {
+      tx.objectStore('userWords').put({
+        translit: '',
+        translitAuto: true,
+        exampleHy: '',
+        exampleRu: '',
+        ...w,
+        ...meta,
+        updatedAt: w.createdAt,
       })
     }
     for (const d of s.days ?? []) {
@@ -145,4 +177,34 @@ export function learnedTopic(topic: string, except: string[] = []): SeedProgress
   return ids(topic, 1, TOPIC_SIZES[topic])
     .filter((id) => !except.includes(id))
     .map((wordId) => ({ wordId, box: 4, dueDate: addDays(TODAY, 8) }))
+}
+
+/** Читает свои наборы/слова/состояния из IndexedDB (только живые записи, как видит приложение). */
+export async function dumpUser(page: Page) {
+  return page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((res, rej) => {
+      const r = indexedDB.open('hayeren')
+      r.onsuccess = () => res(r.result)
+      r.onerror = () => rej(r.error)
+    })
+    const all = (name: string) =>
+      new Promise<Record<string, unknown>[]>((res, rej) => {
+        const r = db.transaction(name).objectStore(name).getAll()
+        r.onsuccess = () => res(r.result)
+        r.onerror = () => rej(r.error)
+      })
+    const live = (rows: Record<string, unknown>[]) => rows.filter((r) => r.deletedAt == null)
+    const byCreated = (rows: Record<string, unknown>[]) =>
+      [...rows].sort((a, b) => Number(a.createdAt) - Number(b.createdAt))
+    const out = {
+      sets: byCreated(live(await all('userSets'))),
+      words: byCreated(live(await all('userWords'))),
+      progress: live(await all('progress')),
+      allSets: await all('userSets'),
+      allWords: await all('userWords'),
+      allProgress: await all('progress'),
+    }
+    db.close()
+    return out
+  })
 }

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "language": "hy-east",
   "translit_scheme": "hayeren-latin-v1",
   "topics": [
@@ -68,7 +68,7 @@
     { "id": "transport-07", "topic": "transport", "hy": "ձախ", "translit": "dzakh", "ru": "налево; левый", "pos": "adv", "example_hy": "Հետո ձախ։", "example_ru": "Потом налево.", "needs_review": false },
     { "id": "transport-08", "topic": "transport", "hy": "ուղիղ", "translit": "ughigh", "ru": "прямо", "pos": "adv", "example_hy": "Գնացեք ուղիղ։", "example_ru": "Езжайте прямо.", "needs_review": false },
     { "id": "transport-09", "topic": "transport", "hy": "այստեղ", "translit": "aystegh", "ru": "здесь, тут", "pos": "adv", "example_hy": "Ես այստեղ եմ։", "example_ru": "Я здесь.", "needs_review": false },
-    { "id": "transport-10", "topic": "transport", "hy": "կանգնեք", "translit": "kangənek'", "ru": "остановитесь", "pos": "verb", "example_hy": "Այստեղ կանգնեք, խնդրում եմ։", "example_ru": "Остановите здесь, пожалуйста.", "needs_review": true },
+    { "id": "transport-10", "topic": "transport", "hy": "կանգնեք", "translit": "kangənek'", "ru": "остановитесь", "pos": "verb", "example_hy": "Այստեղ կանգնեք, խնդրում եմ։", "example_ru": "Остановитесь здесь, пожалуйста.", "needs_review": true },
     { "id": "transport-11", "topic": "transport", "hy": "տոմս", "translit": "toms", "ru": "билет", "pos": "noun", "example_hy": "Մեկ տոմս դեպի Գյումրի։", "example_ru": "Один билет до Гюмри.", "needs_review": false },
     { "id": "transport-12", "topic": "transport", "hy": "օդանավակայան", "translit": "odanavakayan", "ru": "аэропорт", "pos": "noun", "example_hy": "Ինձ տարեք օդանավակայան։", "example_ru": "Отвезите меня в аэропорт.", "needs_review": false },
     { "id": "transport-13", "topic": "transport", "hy": "կայարան", "translit": "kayaran", "ru": "вокзал; станция", "pos": "noun", "example_hy": "Կայարանը մո՞տ է։", "example_ru": "Вокзал близко?", "needs_review": false },

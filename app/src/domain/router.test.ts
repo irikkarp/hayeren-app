@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { matchRoute, parsePath, targetPath } from './router'
+import { addPath, matchRoute, parsePath, parseSetParam, targetPath } from './router'
 
 describe('роутинг', () => {
   it('parsePath', () => {
@@ -37,5 +37,35 @@ describe('роутинг', () => {
     ] as const) {
       expect(matchRoute(targetPath(target))).toEqual({ name: 'session', target })
     }
+  })
+})
+
+describe('маршруты этапа 2', () => {
+  it('набор, слово, шаги добавления', () => {
+    expect(matchRoute('/sets/abc')).toEqual({ name: 'set', setId: 'abc' })
+    expect(matchRoute('/sets/abc/words/u-1')).toEqual({
+      name: 'wordEdit',
+      setId: 'abc',
+      wordId: 'u-1',
+    })
+    expect(matchRoute('/add')).toEqual({ name: 'add' })
+    expect(matchRoute('/add/paste')).toEqual({ name: 'addPaste' })
+    expect(matchRoute('/add/word')).toEqual({ name: 'addWord' })
+    expect(matchRoute('/add/file')).toEqual({ name: 'addFile' })
+    expect(matchRoute('/add/file/columns')).toEqual({ name: 'addColumns' })
+    expect(matchRoute('/add/preview')).toEqual({ name: 'addPreview' })
+    expect(matchRoute('/add/nope')).toEqual({ name: 'notfound' })
+    expect(matchRoute('/sets')).toEqual({ name: 'notfound' })
+    expect(matchRoute('/sets/a/b')).toEqual({ name: 'notfound' })
+  })
+
+  it('?set= передаётся по всему потоку добавления', () => {
+    expect(parseSetParam('#/add/paste?set=abc')).toBe('abc')
+    expect(parseSetParam('#/add/paste')).toBeNull()
+    expect(parseSetParam('#/add?set=')).toBeNull()
+    expect(addPath('', null)).toBe('/add')
+    expect(addPath('file/columns', 'a b')).toBe('/add/file/columns?set=a%20b')
+    expect(parseSetParam(`#${addPath('word', 'a b')}`)).toBe('a b')
+    expect(parsePath('#/add/word?set=x')).toBe('/add/word')
   })
 })

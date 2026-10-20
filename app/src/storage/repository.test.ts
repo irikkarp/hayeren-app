@@ -102,6 +102,41 @@ function contract(
       const snap = await repo.load()
       expect(snap.userWords.map((w) => w.id)).toEqual(['u-1'])
     })
+
+    it('commitUserData: наборы, слова и удаление состояний одной записью; после перезапуска всё на месте', async () => {
+      const { repo, reopen } = await make()
+      await repo.commitAnswer({
+        progress: prog('u-1', 2, 'x'),
+        day: day('2026-10-19'),
+        celebrations: [],
+      })
+      await repo.commitAnswer({
+        progress: prog('u-2', 2, 'x'),
+        day: day('2026-10-19'),
+        celebrations: [],
+      })
+      await repo.commitUserData({
+        sets: [userSet('s1')],
+        words: [userWord('u-1', 's1'), userWord('u-2', 's1')],
+        deleteProgress: [],
+        now: 10,
+      })
+      let snap = await (await reopen()).load()
+      expect(snap.userSets.map((x) => x.id)).toEqual(['s1'])
+      expect(snap.userWords.map((x) => x.id).sort()).toEqual(['u-1', 'u-2'])
+      expect(snap.progress).toHaveLength(2)
+
+      // Мягкое удаление слова и его состояния; второе слово и его состояние остаются.
+      await repo.commitUserData({
+        sets: [],
+        words: [{ ...userWord('u-1', 's1'), deletedAt: 20, updatedAt: 20 }],
+        deleteProgress: ['u-1', 'нет-такого'],
+        now: 20,
+      })
+      snap = await (await reopen()).load()
+      expect(snap.userWords.map((x) => x.id)).toEqual(['u-2'])
+      expect(snap.progress.map((p) => p.wordId)).toEqual(['u-2'])
+    })
   })
 }
 

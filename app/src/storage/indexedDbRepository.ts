@@ -1,4 +1,10 @@
-import { isLive, type AnswerBatch, type Repository, type Snapshot } from './repository'
+import {
+  isLive,
+  type AnswerBatch,
+  type Repository,
+  type Snapshot,
+  type UserDataBatch,
+} from './repository'
 import { MemoryRepository } from './memoryRepository'
 import type {
   CelebrationRec,
@@ -147,6 +153,21 @@ class IndexedDbRepository implements Repository {
   putUserWords(words: UserWord[]): Promise<void> {
     return this.run(['userWords'], 'readwrite', (tx) => {
       for (const w of words) tx.objectStore('userWords').put(w)
+    })
+  }
+
+  commitUserData(batch: UserDataBatch): Promise<void> {
+    return this.run(['userSets', 'userWords', 'progress'], 'readwrite', (tx) => {
+      for (const s of batch.sets) tx.objectStore('userSets').put(s)
+      for (const w of batch.words) tx.objectStore('userWords').put(w)
+      const progress = tx.objectStore('progress')
+      for (const id of batch.deleteProgress) {
+        const get = progress.get(id) as IDBRequest<WordProgress | undefined>
+        get.onsuccess = () => {
+          const p = get.result
+          if (p && isLive(p)) progress.put({ ...p, deletedAt: batch.now, updatedAt: batch.now })
+        }
+      }
     })
   }
 }

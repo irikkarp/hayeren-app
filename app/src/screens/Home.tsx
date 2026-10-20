@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { FEATURES } from '../features'
 import { wordsWord } from '../domain/plural'
 import { SESSION_DUE_LIMIT } from '../domain/queue'
 import { countDue, hasAnyProgress, learnedCount, topicProgress } from '../domain/stats'
@@ -8,6 +7,7 @@ import { navigate } from '../router'
 import { useAppState, useStore } from '../store/context'
 import { Bird, Pattern, Pomegranate, PomegranateOutline, TopicIcon } from '../ui/Icons'
 import { Progress } from '../ui/Progress'
+import { MySetsSection } from './MySets'
 
 const POM_SIZES = [16, 22, 28, 34, 40]
 
@@ -36,12 +36,6 @@ function StreakTile({ days }: { days: number }) {
       </div>
     </div>
   )
-}
-
-/** Раздел «Мои наборы» (этап 2, критерии 38–43): место на главной зарезервировано, пока скрыт. */
-function MySetsSection() {
-  if (!FEATURES.userSets) return null
-  return null
 }
 
 /** S02. Главная: серия, статистика, «Повторить (N)», темы. */

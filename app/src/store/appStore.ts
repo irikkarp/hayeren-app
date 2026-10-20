@@ -11,6 +11,10 @@ import {
   type SessionStats,
   type Verdict,
 } from '../domain/session'
+import type { Delimiter } from '../domain/csv'
+import type { Mapping } from '../domain/importFile'
+import type { ParseOutput } from '../domain/parsedRows'
+import type { SavePlan } from '../domain/preview'
 import { computeStreak } from '../domain/stats'
 import type {
   CelebrationMap,
@@ -24,7 +28,10 @@ import type {
   UserWord,
 } from '../domain/types'
 import { MemoryRepository } from '../storage/memoryRepository'
-import type { Repository } from '../storage/repository'
+import type { Repository, UserDataBatch } from '../storage/repository'
+import { editUserWord } from '../domain/userWords'
+import { validateSetTitle, type SetTitleError, type WordInput } from '../domain/wordValidation'
+import { normalizeText } from '../domain/text'
 
 /** Итог только что законченной сессии: по нему рисуются экраны S04 и S04b. */
 export interface SessionResult {
@@ -36,6 +43,49 @@ export interface SessionResult {
   /** Темы, для которых показывается «Тема выучена» (пусто — обычный итог). */
   celebratedTopicIds: string[]
 }
+
+export type RenameResult = 'ok' | 'failed' | 'unchanged' | SetTitleError
+
+/** Прочитанный файл импорта (таблица строк) до сопоставления колонок. */
+export interface ImportedFile {
+  name: string
+  /** Имя листа xlsx (первого); у CSV null. */
+  sheetName: string | null
+  /** В xlsx больше одного листа: показывается уведомление (критерий 73). */
+  multiSheet: boolean
+  rows: string[][]
+  /** Исходный текст CSV (нужен, чтобы перечитать с другим разделителем); у xlsx null. */
+  csvText: string | null
+  /** Разделитель CSV, с которым прочитан файл; у xlsx null. */
+  delimiter: Delimiter | null
+  /** Выбор разделителя на S14 ('auto' или конкретный); по умолчанию 'auto'. */
+  delimiterChoice?: 'auto' | Delimiter
+}
+
+/** Результат разбора для экрана предпросмотра (S11). */
+export interface PreviewSource {
+  source: 'paste' | 'file'
+  fileName: string | null
+  parsed: ParseOutput
+}
+
+/**
+ * Незавершённый ввод при добавлении слов (S10 → S11, S13 → S14 → S11): держится в памяти,
+ * пока пользователь не вышел из потока, чтобы «Назад» не терял данные (критерии 44, 64).
+ */
+export interface AddFlow {
+  pasteText: string
+  file: ImportedFile | null
+  mapping: Mapping | null
+  preview: PreviewSource | null
+}
+
+export const emptyAddFlow = (): AddFlow => ({
+  pasteText: '',
+  file: null,
+  mapping: null,
+  preview: null,
+})
 
 export interface AppState {
   phase: 'loading' | 'ready' | 'error'
@@ -50,6 +100,7 @@ export interface AppState {
   celebrations: CelebrationMap
   userSets: UserSet[]
   userWords: UserWord[]
+  addFlow: AddFlow
   /** Последняя запись не удалась: данные живут только до конца сессии. */
   saveFailed: boolean
   lastResult: SessionResult | null
@@ -91,6 +142,7 @@ export class AppStore {
       celebrations: {},
       userSets: [],
       userWords: [],
+      addFlow: emptyAddFlow(),
       saveFailed: false,
       lastResult: null,
       sessionNonce: 0,
@@ -121,6 +173,11 @@ export class AppStore {
 
   get content(): Content {
     return this.deps.content
+  }
+
+  /** Текущий момент по часам приложения (для названия набора «Набор от ДД.ММ»). */
+  getNowDate(): Date {
+    return this.now()
   }
 
   getToday(): DateKey {
@@ -329,6 +386,121 @@ export class AppStore {
   /** Заставляет экран сессии построить очередь заново. */
   restartSession(): void {
     this.set({ sessionNonce: this.state.sessionNonce + 1, lastResult: null })
+  }
+
+  // --- свои наборы и слова (этап 2) ---
+
+  /**
+   * Записывает изменение своих наборов и слов, затем обновляет состояние. false — запись не
+   * удалась, состояние не менялось (экран показывает ошибку и сохраняет ввод пользователя).
+   */
+  private async commitUserData(batch: Omit<UserDataBatch, 'now'>): Promise<boolean> {
+    const now = this.now().getTime()
+    try {
+      await this.repo.commitUserData({ ...batch, now })
+    } catch {
+      return false
+    }
+    const merge = <T extends { id: string; deletedAt: number | null }>(list: T[], changed: T[]) => {
+      const byId = new Map(list.map((r) => [r.id, r]))
+      for (const r of changed) {
+        if (r.deletedAt == null) byId.set(r.id, r)
+        else byId.delete(r.id)
+      }
+      return [...byId.values()]
+    }
+    const gone = new Set(batch.deleteProgress)
+    const progress = gone.size
+      ? Object.fromEntries(Object.entries(this.state.progress).filter(([id]) => !gone.has(id)))
+      : this.state.progress
+    this.set({
+      userSets: merge(this.state.userSets, batch.sets),
+      userWords: merge(this.state.userWords, batch.words),
+      progress,
+    })
+    return true
+  }
+
+  /** Просит у браузера постоянное хранилище при первом сохранении своих слов (критерий 85). */
+  private requestPersistentStorage(): void {
+    try {
+      void navigator.storage?.persist?.().catch(() => {})
+    } catch {
+      // отказ или отсутствие API ничему не мешает
+    }
+  }
+
+  /** Сохраняет новые слова и наборы одной операцией (вставка, форма, импорт). */
+  async saveUserWords(plan: SavePlan): Promise<boolean> {
+    const first = this.state.userWords.length === 0
+    const ok = await this.commitUserData({
+      sets: plan.newSets,
+      words: plan.words,
+      deleteProgress: [],
+    })
+    if (ok && first) this.requestPersistentStorage()
+    return ok
+  }
+
+  /** Переименование набора; ошибка названия возвращается, а не бросается. */
+  async renameSet(setId: string, title: string): Promise<RenameResult> {
+    const set = this.state.userSets.find((s) => s.id === setId)
+    if (!set) return 'failed'
+    const others = this.state.userSets.filter((s) => s.id !== setId).map((s) => s.title)
+    const error = validateSetTitle(title, others)
+    if (error) return error
+    const next = normalizeText(title)
+    if (next === set.title) return 'unchanged'
+    const ok = await this.commitUserData({
+      sets: [{ ...set, title: next, updatedAt: this.now().getTime() }],
+      words: [],
+      deleteProgress: [],
+    })
+    return ok ? 'ok' : 'failed'
+  }
+
+  /** Удаляет набор, его слова и их состояния SRS (критерий 41). */
+  async deleteSet(setId: string): Promise<boolean> {
+    const set = this.state.userSets.find((s) => s.id === setId)
+    if (!set) return true
+    const now = this.now().getTime()
+    const words = this.state.userWords.filter((w) => w.setId === setId)
+    return this.commitUserData({
+      sets: [{ ...set, deletedAt: now, updatedAt: now }],
+      words: words.map((w) => ({ ...w, deletedAt: now, updatedAt: now })),
+      deleteProgress: words.map((w) => w.id),
+    })
+  }
+
+  /** Изменение слова; состояние SRS не трогается (критерий 81). */
+  async updateWord(wordId: string, input: WordInput): Promise<boolean> {
+    const word = this.state.userWords.find((w) => w.id === wordId)
+    if (!word) return false
+    return this.commitUserData({
+      sets: [],
+      words: [editUserWord(word, input, this.now().getTime())],
+      deleteProgress: [],
+    })
+  }
+
+  /** Удаляет слово и его состояние SRS (критерий 82). */
+  async deleteWord(wordId: string): Promise<boolean> {
+    const word = this.state.userWords.find((w) => w.id === wordId)
+    if (!word) return true
+    const now = this.now().getTime()
+    return this.commitUserData({
+      sets: [],
+      words: [{ ...word, deletedAt: now, updatedAt: now }],
+      deleteProgress: [wordId],
+    })
+  }
+
+  // --- незавершённый ввод ---
+  setAddFlow(patch: Partial<AddFlow>): void {
+    this.set({ addFlow: { ...this.state.addFlow, ...patch } })
+  }
+  resetAddFlow(): void {
+    this.set({ addFlow: emptyAddFlow() })
   }
 
   /** «Сбросить прогресс»: состояния слов, серия и отметки «Тема выучена»; режим и слова остаются. */

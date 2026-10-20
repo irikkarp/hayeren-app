@@ -6,7 +6,13 @@ import type {
   UserWord,
   WordProgress,
 } from '../domain/types'
-import { isLive, type AnswerBatch, type Repository, type Snapshot } from './repository'
+import {
+  isLive,
+  type AnswerBatch,
+  type Repository,
+  type Snapshot,
+  type UserDataBatch,
+} from './repository'
 
 /**
  * Хранилище в памяти. Используется в тестах и как запасной вариант, когда IndexedDB недоступна
@@ -72,5 +78,15 @@ export class MemoryRepository implements Repository {
 
   async putUserWords(words: UserWord[]): Promise<void> {
     for (const w of words) this.userWords.set(w.id, w)
+  }
+
+  async commitUserData(batch: UserDataBatch): Promise<void> {
+    for (const s of batch.sets) this.userSets.set(s.id, s)
+    for (const w of batch.words) this.userWords.set(w.id, w)
+    for (const id of batch.deleteProgress) {
+      const p = this.progress.get(id)
+      if (p && isLive(p))
+        this.progress.set(id, { ...p, deletedAt: batch.now, updatedAt: batch.now })
+    }
   }
 }

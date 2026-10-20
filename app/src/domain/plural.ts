@@ -15,3 +15,5 @@ export function plural(n: number, forms: readonly [string, string, string]): str
 
 export const daysWord = (n: number) => plural(n, ['день', 'дня', 'дней'])
 export const wordsWord = (n: number) => plural(n, ['слово', 'слова', 'слов'])
+export const setsWord = (n: number) => plural(n, ['набор', 'набора', 'наборов'])
+export const rowsWord = (n: number) => plural(n, ['строка', 'строки', 'строк'])

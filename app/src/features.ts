@@ -4,6 +4,6 @@
  * - backup: экспорт в CSV, «Резервная копия» в настройках (критерии 88–109).
  */
 export const FEATURES = {
-  userSets: false,
+  userSets: true,
   backup: false,
 } as const

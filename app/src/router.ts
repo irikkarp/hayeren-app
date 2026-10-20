@@ -1,5 +1,5 @@
 import { useMemo, useSyncExternalStore } from 'react'
-import { matchRoute, parsePath, type Route } from './domain/router'
+import { matchRoute, parsePath, parseSetParam, type Route } from './domain/router'
 
 const subscribe = (cb: () => void) => {
   window.addEventListener('hashchange', cb)
@@ -8,11 +8,11 @@ const subscribe = (cb: () => void) => {
 const getHash = () => window.location.hash
 
 /** Текущий маршрут (hash-роутинг: работает на любом статическом хостинге и офлайн). */
-export function useRoute(): { route: Route; path: string } {
+export function useRoute(): { route: Route; path: string; setParam: string | null } {
   const hash = useSyncExternalStore(subscribe, getHash)
   return useMemo(() => {
     const path = parsePath(hash)
-    return { path, route: matchRoute(path) }
+    return { path, route: matchRoute(path), setParam: parseSetParam(hash) }
   }, [hash])
 }
 

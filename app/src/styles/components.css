@@ -697,7 +697,7 @@ button.chip {
 }
 .map-table th {
   background: var(--color-sunken);
-  min-width: 176px;
+  min-width: 208px;
   font-weight: 400;
 }
 .map-table th .colname {
@@ -784,4 +784,130 @@ button.chip {
       background-color 0.12s,
       border-color 0.12s;
   }
+}
+
+/* ---------- Свои наборы и слова (этап 2) ---------- */
+.grow-1 {
+  flex: 1;
+}
+.plain-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Строка набора на главной: текст открывает набор, справа «Учить» */
+.row.set-row {
+  cursor: default;
+  padding: 0 10px 0 0;
+  gap: var(--space-2);
+}
+.set-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 0 10px 14px;
+  color: inherit;
+  text-decoration: none;
+}
+.set-main .name {
+  overflow-wrap: anywhere;
+}
+
+/* Строка слова в наборе */
+.word-row .line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+}
+.word-row {
+  padding-left: 14px;
+}
+.big-row {
+  min-height: 72px;
+  padding-left: 14px;
+}
+
+/* Метка «авто» с подсказкой */
+button.chip.chip-auto {
+  min-height: 24px;
+  font-family: inherit;
+}
+.auto-hint {
+  display: block;
+  margin-top: 4px;
+  padding: 6px 10px;
+  max-width: 34ch;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--color-text);
+  background: var(--color-warning-soft);
+  border-radius: var(--radius-md);
+}
+.translit .auto-hint {
+  margin-inline: auto;
+}
+
+/* Предпросмотр: пример одной строкой */
+.pv-example {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pv-row .line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
+}
+
+/* Выбор файла */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.dropzone.is-drag {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.dropzone-or {
+  display: none;
+}
+@media (hover: hover) and (min-width: 720px) {
+  .dropzone-or {
+    display: block;
+    text-align: center;
+  }
+}
+.dropzone p[role='status'] {
+  cursor: progress;
+}
+
+/* Пользовательский текст переносится в любом месте: без горизонтальной прокрутки на 320px */
+.translit,
+.word-card .ru,
+.example,
+.set-main,
+.word-row .grow,
+.pv-body,
+.err-row,
+.error-text,
+.hint,
+.banner,
+.sheet h2,
+.row .name {
+  overflow-wrap: anywhere;
 }

@@ -8,7 +8,7 @@ describe('нормализация', () => {
   })
 
   it('ключ: регистр, եւ → և, армянские знаки', () => {
-    expect(normalizeKey('ԲԱՐԵՎ')).toBe('բարեվ')
+    expect(normalizeKey('ԲԱՐԵՎ')).toBe('բարև')
     expect(normalizeKey('Բարեւ')).toBe(normalizeKey('բարև'))
     expect(normalizeKey('Ինչպե՞ս')).toBe('ինչպես')
     expect(normalizeKey('  Բարև   Ձեզ ')).toBe('բարև ձեզ')

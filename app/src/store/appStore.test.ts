@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { content } from '../data/content'
 import { toDateKey } from '../domain/dates'
 import type { SessionTarget } from '../domain/queue'
-import { isFinished, sessionStats, type Verdict } from '../domain/session'
+import { dropMissing, isFinished, sessionStats, type Verdict } from '../domain/session'
 import { countDue, learnedCount } from '../domain/stats'
 import { MemoryRepository } from '../storage/memoryRepository'
 import type { Repository } from '../storage/repository'
@@ -382,5 +382,201 @@ describe('«Тема выучена» (критерии 124–135, 138)', () => 
     await reloaded.store.start()
     expect(reloaded.store.getState().celebrations).toEqual({})
     expect(reloaded.store.getState().progress).toEqual({})
+  })
+})
+
+describe('свои наборы и слова (критерии 38–44, 81–86)', () => {
+  const plan = (n: number, setId = 's1', newSets = true) => ({
+    newSets: newSets ? [userSet(setId, 100)] : [],
+    words: Array.from({ length: n }, (_, i) => userWord(`u-${i + 1}`, setId, 101 + i)),
+    touchedSetIds: [setId],
+    touchedTitles: [`Набор ${setId}`],
+  })
+
+  it('сохранение: набор и слова попадают в каталог, в хранилище и переживают перезапуск', async () => {
+    const repo = new MemoryRepository(true)
+    const { store } = await ready(repo)
+    expect(await store.saveUserWords(plan(3))).toBe(true)
+    expect(store.getState().userSets).toHaveLength(1)
+    expect(
+      store
+        .getCatalog()
+        .setWords('s1')
+        .map((w) => w.id),
+    ).toEqual(['u-1', 'u-2', 'u-3'])
+    expect(store.getCatalog().words).toHaveLength(88 + 3)
+
+    const second = makeStore(repo)
+    await second.store.start()
+    expect(second.store.getCatalog().setWords('s1')).toHaveLength(3)
+  })
+
+  it('запись не удалась: false, состояние не менялось (ввод пользователя остаётся на экране)', async () => {
+    const repo = new MemoryRepository(true)
+    const { store } = await ready(repo)
+    repo.commitUserData = async () => {
+      throw new Error('диск полон')
+    }
+    expect(await store.saveUserWords(plan(2))).toBe(false)
+    expect(store.getState().userWords).toEqual([])
+    expect(store.getState().userSets).toEqual([])
+  })
+
+  it('42/111: свои слова участвуют в сессии набора и в «Повторить (N)» наравне со встроенными', async () => {
+    const { store, clock } = await ready()
+    await store.saveUserWords(plan(2))
+    play(store, { type: 'set', setId: 's1' })
+    expect(Object.keys(store.getState().progress).sort()).toEqual(['u-1', 'u-2'])
+    clock.now = new Date(2026, 9, 21, 8, 0)
+    store.refreshToday()
+    const { progress, today } = store.getState()
+    expect(countDue(store.getCatalog(), progress, today)).toBe(2)
+    expect(store.startSession({ type: 'review' }).queue.map((i) => i.wordId)).toEqual([
+      'u-1',
+      'u-2',
+    ])
+  })
+
+  it('42: дневной лимит новых слов общий со встроенными темами', async () => {
+    const { store } = await ready()
+    await store.saveUserWords(plan(12))
+    play(store, topicOf('greetings')) // 10 новых слов за день
+    expect(store.startSession({ type: 'set', setId: 's1' }).queue).toHaveLength(0)
+  })
+
+  it('81: изменение слова не трогает состояние SRS', async () => {
+    const { store } = await ready()
+    await store.saveUserWords(plan(1))
+    play(store, { type: 'set', setId: 's1' })
+    const before = store.getState().progress['u-1']
+    expect(
+      await store.updateWord('u-1', {
+        hy: 'հաց',
+        ru: 'хлеб',
+        translit: '',
+        exampleHy: '',
+        exampleRu: '',
+      }),
+    ).toBe(true)
+    const word = store.getState().userWords[0]
+    expect(word).toMatchObject({ hy: 'հաց', translit: "hats'", translitAuto: true })
+    expect(store.getState().progress['u-1']).toEqual(before)
+  })
+
+  it('82: удаление слова убирает его и его состояние; из очереди сессии оно исчезает', async () => {
+    const repo = new MemoryRepository(true)
+    const { store } = await ready(repo)
+    await store.saveUserWords(plan(3))
+    play(store, { type: 'set', setId: 's1' })
+    expect(await store.deleteWord('u-2')).toBe(true)
+    const snap = await repo.load()
+    expect(snap.userWords.map((w) => w.id)).toEqual(['u-1', 'u-3'])
+    expect(snap.progress.map((p) => p.wordId).sort()).toEqual(['u-1', 'u-3'])
+    expect(store.getCatalog().byId.has('u-2')).toBe(false)
+  })
+
+  it('82: слово, удалённое во время сессии, из очереди пропадает', async () => {
+    const { store } = await ready()
+    await store.saveUserWords(plan(3))
+    const session = store.startSession({ type: 'set', setId: 's1' })
+    expect(session.queue.map((i) => i.wordId)).toEqual(['u-1', 'u-2', 'u-3'])
+    await store.deleteWord('u-2')
+    const alive = new Set(store.getCatalog().words.map((w) => w.id))
+    expect(dropMissing(session, alive).queue.map((i) => i.wordId)).toEqual(['u-1', 'u-3'])
+  })
+
+  it('41: удаление набора убирает набор, все его слова и их состояния, остальные наборы целы', async () => {
+    const repo = new MemoryRepository(true)
+    const { store } = await ready(repo)
+    await store.saveUserWords(plan(2, 's1'))
+    await store.saveUserWords({
+      newSets: [userSet('s2', 200)],
+      words: [userWord('u-9', 's2', 201)],
+      touchedSetIds: ['s2'],
+      touchedTitles: ['Набор s2'],
+    })
+    play(store, { type: 'set', setId: 's1' })
+    play(store, { type: 'set', setId: 's2' })
+    expect(await store.deleteSet('s1')).toBe(true)
+    const snap = await repo.load()
+    expect(snap.userSets.map((s) => s.id)).toEqual(['s2'])
+    expect(snap.userWords.map((w) => w.id)).toEqual(['u-9'])
+    expect(snap.progress.map((p) => p.wordId)).toEqual(['u-9'])
+    expect(store.getCatalog().words).toHaveLength(88 + 1)
+  })
+
+  it('40: переименование: ошибки названия, «без изменений», успех', async () => {
+    const { store } = await ready()
+    await store.saveUserWords(plan(1, 's1'))
+    await store.saveUserWords({
+      newSets: [{ ...userSet('s2', 200), title: 'Кухня' }],
+      words: [],
+      touchedSetIds: ['s2'],
+      touchedTitles: ['Кухня'],
+    })
+    expect(await store.renameSet('s1', '  ')).toBe('empty')
+    expect(await store.renameSet('s1', 'кухня')).toBe('duplicate')
+    expect(await store.renameSet('s1', 'x'.repeat(51))).toBe('tooLong')
+    expect(await store.renameSet('s1', 'Набор s1')).toBe('unchanged')
+    expect(await store.renameSet('s1', 'НАБОР S1')).toBe('ok') // свой вариант в другом регистре
+    expect(store.getState().userSets.find((s) => s.id === 's1')?.title).toBe('НАБОР S1')
+  })
+
+  it('43: набор без слов остаётся в списке', async () => {
+    const { store } = await ready()
+    await store.saveUserWords(plan(1))
+    await store.deleteWord('u-1')
+    expect(store.getState().userSets).toHaveLength(1)
+    expect(store.getCatalog().setWords('s1')).toEqual([])
+  })
+
+  it('86: «Сбросить прогресс» не удаляет свои наборы и слова', async () => {
+    const { store } = await ready()
+    await store.saveUserWords(plan(2))
+    play(store, { type: 'set', setId: 's1' })
+    await store.resetProgress()
+    expect(store.getState().progress).toEqual({})
+    expect(store.getState().userWords).toHaveLength(2)
+    expect(store.getState().userSets).toHaveLength(1)
+  })
+
+  it('незавершённый ввод: хранится в памяти и сбрасывается', async () => {
+    const { store } = await ready()
+    store.setAddFlow({ pasteText: 'բարև — привет' })
+    expect(store.getState().addFlow.pasteText).toBe('բարև — привет')
+    store.resetAddFlow()
+    expect(store.getState().addFlow.pasteText).toBe('')
+  })
+})
+
+describe('31: обновление словаря (words.json version 2) при сохранённом прогрессе', () => {
+  it('прогресс по существующим id сохраняется, изменённый текст подхватывается, версия не важна', async () => {
+    const repo = new MemoryRepository(true)
+    const v1 = {
+      ...content,
+      version: 1,
+      words: content.words.map((w) =>
+        w.id === 'transport-10' ? { ...w, example_ru: 'Остановите здесь, пожалуйста.' } : w,
+      ),
+    }
+    const first = new AppStore({ openRepository: async () => repo, content: v1 })
+    await first.start()
+    await first.chooseMode('beginner')
+    play(first, topicOf('transport'))
+    const progress = first.getState().progress
+    await first.whenSaved()
+    expect(progress['transport-10']).toBeDefined()
+
+    // Новая версия приложения: version 2 и другой перевод примера.
+    const second = new AppStore({ openRepository: async () => repo, content })
+    await second.start()
+    expect(content.version).toBeGreaterThanOrEqual(2)
+    expect(second.getState().progress['transport-10']).toEqual(progress['transport-10'])
+    expect(second.getCatalog().byId.get('transport-10')?.exampleRu).toBe(
+      'Остановитесь здесь, пожалуйста.',
+    )
+    expect(learnedCount(second.getCatalog(), second.getState().progress)).toBe(
+      learnedCount(first.getCatalog(), first.getState().progress),
+    )
   })
 })

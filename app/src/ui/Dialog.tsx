@@ -1,10 +1,12 @@
-import { useEffect, useId, useRef } from 'react'
+import { useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { useModal } from './useModal'
 
 interface Props {
   title: string
   description?: string
   confirmLabel: string
+  cancelLabel?: string
   /** Разрушающее действие: кнопка подтверждения красная (`danger`). */
   danger?: boolean
   onConfirm: () => void
@@ -19,6 +21,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel,
+  cancelLabel = 'Отмена',
   danger,
   onConfirm,
   onCancel,
@@ -27,43 +30,7 @@ export function ConfirmDialog({
   const descId = useId()
   const cancelRef = useRef<HTMLButtonElement>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
-  const cancelHandler = useRef(onCancel)
-
-  useEffect(() => {
-    cancelHandler.current = onCancel
-  })
-
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    const root = document.getElementById('root')
-    root?.setAttribute('inert', '')
-    cancelRef.current?.focus()
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        cancelHandler.current()
-      } else if (e.key === 'Tab') {
-        const buttons = sheetRef.current?.querySelectorAll<HTMLButtonElement>('button')
-        if (!buttons || buttons.length === 0) return
-        const first = buttons[0]
-        const last = buttons[buttons.length - 1]
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault()
-          last.focus()
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault()
-          first.focus()
-        }
-      }
-    }
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      root?.removeAttribute('inert')
-      opener?.focus()
-    }
-  }, [])
+  useModal(sheetRef, cancelRef, onCancel)
 
   return createPortal(
     <div
@@ -101,7 +68,7 @@ export function ConfirmDialog({
           ref={cancelRef}
           onClick={onCancel}
         >
-          Отмена
+          {cancelLabel}
         </button>
       </div>
     </div>,

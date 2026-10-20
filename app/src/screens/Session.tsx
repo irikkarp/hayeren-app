@@ -13,6 +13,7 @@ import {
 import type { CardWord } from '../domain/types'
 import { navigate, goBack } from '../router'
 import { useAppState, useStore } from '../store/context'
+import { AutoChip } from '../ui/AutoChip'
 import { HeroWord } from '../ui/HeroWord'
 import { Khachkar } from '../ui/Icons'
 import { Progress } from '../ui/Progress'
@@ -26,7 +27,7 @@ function Translit({ word }: { word: CardWord }) {
       {word.translitAuto && (
         <>
           {' '}
-          <span className="chip chip-auto">авто</span>
+          <AutoChip />
         </>
       )}
     </p>
@@ -64,7 +65,9 @@ function NoCards({ target }: { target: SessionTarget }) {
           <h1 className="t-heading">
             {limitReached
               ? 'На сегодня новых слов достаточно. Возвращайтесь завтра'
-              : 'В этой теме нечего повторять сегодня'}
+              : target.type === 'set'
+                ? 'В этом наборе нечего повторять сегодня'
+                : 'В этой теме нечего повторять сегодня'}
           </h1>
           {limitReached && (
             <button type="button" className="btn btn-primary btn-block" onClick={learnMore}>

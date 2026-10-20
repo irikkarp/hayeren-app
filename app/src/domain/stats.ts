@@ -60,3 +60,14 @@ export function computeStreak(days: DayMap, today: DateKey): number {
   }
   return streak
 }
+
+export interface SetProgress {
+  learned: number
+  total: number
+}
+
+/** Прогресс своего набора: «выучено X из N» (критерий 38). */
+export function setProgress(catalog: Catalog, setId: string, progress: ProgressMap): SetProgress {
+  const words = catalog.setWords(setId)
+  return { learned: words.filter((w) => isLearned(progress[w.id])).length, total: words.length }
+}

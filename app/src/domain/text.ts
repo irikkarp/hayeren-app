@@ -1,8 +1,14 @@
 const ARMENIAN_PUNCTUATION = /[՞՜՛]/g
 
-/** Unicode NFC, обрезка пробелов по краям, схлопывание повторных пробелов. Регистр не меняется. */
+/** Невидимые символы: нулевой ширины, направления письма, мягкий перенос, BOM, word joiner. */
+const INVISIBLE = /[\u200B-\u200F\u202A-\u202E\u2060\u00AD\uFEFF]/g
+
+/**
+ * Unicode NFC, удаление невидимых символов (копирование из мессенджеров), обрезка пробелов по
+ * краям, схлопывание повторных пробелов. Регистр не меняется.
+ */
 export function normalizeText(s: string): string {
-  return s.normalize('NFC').trim().replace(/\s+/g, ' ')
+  return s.normalize('NFC').replace(INVISIBLE, '').trim().replace(/\s+/g, ' ')
 }
 
 /**
@@ -10,7 +16,11 @@ export function normalizeText(s: string): string {
  * нижний регистр, `եւ` → `և`, без армянских знаков `՞ ՜ ՛`.
  */
 export function normalizeKey(s: string): string {
-  return normalizeText(s).toLowerCase().replaceAll('եւ', 'և').replace(ARMENIAN_PUNCTUATION, '')
+  return normalizeText(s)
+    .toLowerCase()
+    .replaceAll('եւ', 'և')
+    .replaceAll('եվ', 'և') // ԵՎ — заглавная форма և
+    .replace(ARMENIAN_PUNCTUATION, '')
 }
 
 /** Длина самого длинного слова (в символах Unicode после NFC): по ней выбирается кегль слова на карточке. */
