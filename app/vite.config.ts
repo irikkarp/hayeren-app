@@ -8,7 +8,11 @@ import { VitePWA } from 'vite-plugin-pwa'
 // Встроенный словарь живёт в docs/content (источник правды для контента), а не в app/src.
 const contentDir = fileURLToPath(new URL('../docs/content', import.meta.url))
 
+// Базовый путь: '/' по умолчанию; '/hayeren-app/' для GitHub Pages (задаётся через VITE_BASE при сборке).
+const base = process.env.VITE_BASE ?? '/'
+
 export default defineConfig({
+  base,
   resolve: { alias: { '@content': contentDir } },
   server: { fs: { allow: ['..'] } },
   plugins: [
@@ -21,8 +25,8 @@ export default defineConfig({
         short_name: 'Hayeren',
         description: 'Изучение армянских слов',
         lang: 'ru',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         display: 'standalone',
         background_color: '#F4E7CB',
         theme_color: '#7E1727',

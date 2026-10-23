@@ -39,7 +39,8 @@ PWA (service worker, офлайн) работает только в production-�
 
 ```
 .
-├── .github/workflows/ci.yml   # CI (GitHub Actions)
+├── .github/workflows/ci.yml            # CI (GitHub Actions)
+├── .github/workflows/deploy-pages.yml  # деплой на GitHub Pages
 ├── .gitignore
 ├── docs/                      # продуктовая документация; docs/devops/ — этот файл
 └── app/                       # веб-приложение
@@ -91,7 +92,24 @@ Workflow пока только лежит в репозитории: удалё�
 
 ## Деплой
 
-Пока не настроен. Кандидаты из PRODUCT.md: GitHub Pages, Netlify, Vercel. Для Netlify/Vercel достаточно указать base directory `app`, команду `npm run build` и папку публикации `dist`. Для GitHub Pages на подпути `/<repo>/` придётся задать `base` в `vite.config.ts` и поменять `start_url`/`scope` в манифесте. Выбор хостинга остаётся за владельцем продукта.
+Хостинг: GitHub Pages, публичный репозиторий `hayeren-app` (решение владельца, 2026-10-23). Адрес: `https://<логин>.github.io/hayeren-app/`. Подробный пошаговый план и оговорки: `docs/devops/deploy-plan.md`.
+
+Workflow `.github/workflows/deploy-pages.yml` срабатывает на push в `main` и вручную (Actions → Run workflow):
+
+1. job `build`: `npm ci`, `npm run lint`, `npm test`, `npm run build` с `VITE_BASE=/hayeren-app/`, загрузка `app/dist` как артефакта Pages (e2e тут нет, они в `ci.yml`);
+2. job `deploy`: публикация через `actions/deploy-pages` (права `pages: write`, `id-token: write`).
+
+Разовая настройка репозитория: Settings → Pages → Source: GitHub Actions. Секреты не нужны. Статус деплоя смотреть во вкладке Actions, адрес в Settings → Pages.
+
+Локальная проверка сборки под подпутём:
+
+```bash
+cd app
+VITE_BASE=/hayeren-app/ npm run build
+VITE_BASE=/hayeren-app/ npm run test:e2e -- basepath   # smoke: страница, манифест, scope service worker
+```
+
+Роутинг hash-based, поэтому `404.html` не нужен. Файлы на Pages кэшируются до 10 минут, обновления приложения могут доезжать с задержкой.
 
 ## Позже: Capacitor
 
