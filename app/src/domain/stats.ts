@@ -1,7 +1,8 @@
 import type { DateKey } from './dates'
 import { addDays } from './dates'
 import type { Catalog } from './catalog'
-import { isDue, isLearned } from './srs'
+import { progressCounts } from './progress'
+import { isDue } from './srs'
 import type { DayMap, ProgressMap } from './types'
 
 /**
@@ -17,9 +18,7 @@ export function countDue(catalog: Catalog, progress: ProgressMap, today: DateKey
 
 /** Сколько слов выучено (box ≥ 4) среди слов каталога. */
 export function learnedCount(catalog: Catalog, progress: ProgressMap): number {
-  let n = 0
-  for (const w of catalog.words) if (isLearned(progress[w.id])) n++
-  return n
+  return progressCounts(catalog.words, progress).learned
 }
 
 /** Есть ли хотя бы одно слово с состоянием (нужно для текста при N = 0). */
@@ -39,7 +38,7 @@ export function topicProgress(
   progress: ProgressMap,
 ): TopicProgress {
   const words = catalog.topicWords(topicId)
-  const learned = words.filter((w) => isLearned(progress[w.id])).length
+  const { learned } = progressCounts(words, progress)
   return { learned, total: words.length, isLearned: words.length > 0 && learned === words.length }
 }
 
@@ -59,15 +58,4 @@ export function computeStreak(days: DayMap, today: DateKey): number {
     cursor = addDays(cursor, -1)
   }
   return streak
-}
-
-export interface SetProgress {
-  learned: number
-  total: number
-}
-
-/** Прогресс своего набора: «выучено X из N» (критерий 38). */
-export function setProgress(catalog: Catalog, setId: string, progress: ProgressMap): SetProgress {
-  const words = catalog.setWords(setId)
-  return { learned: words.filter((w) => isLearned(progress[w.id])).length, total: words.length }
 }

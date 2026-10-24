@@ -1,9 +1,8 @@
-import { wordsWord } from '../domain/plural'
-import { setProgress } from '../domain/stats'
+import { progressCounts } from '../domain/progress'
 import { FEATURES } from '../features'
 import { useAppState, useStore } from '../store/context'
 import { Khachkar } from '../ui/Icons'
-import { Progress } from '../ui/Progress'
+import { ProgressBar, ProgressLine } from '../ui/Progress'
 
 /** Раздел «Мои наборы» на главной (критерии 38–39, 43): список наборов, новые сверху. */
 export function MySetsSection() {
@@ -37,20 +36,18 @@ export function MySetsSection() {
       ) : (
         <ul className="list">
           {sets.map((set) => {
-            const p = setProgress(catalog, set.id, progress)
+            const p = progressCounts(catalog.setWords(set.id), progress)
             return (
               <li className="row set-row" key={set.id}>
                 <a className="set-main" href={`#/sets/${encodeURIComponent(set.id)}`}>
                   <span className="name">{set.title}</span>
-                  <span className="muted t-small">
-                    {p.total === 0 ? '0 слов' : `выучено ${p.learned} из ${p.total}`}
-                  </span>
-                  {p.total > 0 && (
-                    <Progress
-                      value={p.learned}
-                      max={p.total}
-                      label={`Набор «${set.title}»: выучено ${p.learned} из ${p.total} ${wordsWord(p.total)}`}
-                    />
+                  {p.total === 0 ? (
+                    <span className="muted t-small">0 слов</span>
+                  ) : (
+                    <>
+                      <ProgressLine counts={p} />
+                      <ProgressBar counts={p} label={`Набор «${set.title}»`} />
+                    </>
                   )}
                 </a>
                 {p.total > 0 && (

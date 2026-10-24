@@ -51,8 +51,9 @@ describe('главная (критерии 6–8, 23, 110–113)', () => {
     const rows = screen.getAllByRole('link', { name: /выучено 0 из/ })
     expect(rows).toHaveLength(6)
     expect(screen.getByText('Приветствия и вежливость')).toBeInTheDocument()
-    expect(screen.getAllByText('выучено 0 из 15')).toHaveLength(4)
-    expect(screen.getAllByText('выучено 0 из 14')).toHaveLength(2)
+    const lines = rows.map((r) => r.querySelector('.pl')?.textContent)
+    expect(lines.filter((l) => l === 'выучено 0 из 15')).toHaveLength(4)
+    expect(lines.filter((l) => l === 'выучено 0 из 14')).toHaveLength(2)
   })
 
   it('23: плитки «Выучено 0 из 88» и «Повторить сегодня 0»; серия 0', async () => {

@@ -7,6 +7,7 @@ import {
   createSession,
   type AnswerOutcome,
   type AnswerUpdate,
+  type NewWordsStats,
   type SessionState,
   type SessionStats,
   type Verdict,
@@ -39,6 +40,8 @@ import { normalizeText } from '../domain/text'
 export interface SessionResult {
   target: SessionTarget
   stats: SessionStats
+  /** Новые слова, получившие состояние в сессии (пояснение в итоге, критерий 154). */
+  newWords: NewWordsStats
   stopped: boolean
   /** Серия до сессии: чтобы показать «Серия растёт». */
   streakBefore: number
@@ -350,6 +353,7 @@ export class AppStore {
   finishSession(
     target: SessionTarget,
     stats: SessionStats,
+    newWords: NewWordsStats,
     stopped: boolean,
     streakBefore: number,
   ) {
@@ -366,6 +370,7 @@ export class AppStore {
       lastResult: {
         target,
         stats,
+        newWords,
         stopped,
         streakBefore,
         celebratedTopicIds: end.shown.map((t) => t.id),

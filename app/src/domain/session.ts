@@ -13,6 +13,8 @@ export interface SessionState {
   handled: number
   /** Первый ответ на каждое слово: по нему считаются «Пройдено / Знаю / Не знаю». */
   first: Record<string, Verdict>
+  /** Слова, получившие состояние впервые в этой сессии (были новыми), с первым ответом. */
+  fresh: Record<string, Verdict>
 }
 
 export interface AnswerContext {
@@ -44,8 +46,14 @@ export interface SessionStats {
   dont: number
 }
 
+/** Сколько слов получили состояние впервые (m) и сколько из них получили «Знаю» (критерий 154). */
+export interface NewWordsStats {
+  count: number
+  know: number
+}
+
 export function createSession(queue: QueueItem[]): SessionState {
-  return { queue, handled: 0, first: {} }
+  return { queue, handled: 0, first: {}, fresh: {} }
 }
 
 export const currentItem = (s: SessionState): QueueItem | undefined => s.queue[0]
@@ -78,6 +86,7 @@ export function answer(s: SessionState, verdict: Verdict, ctx: AnswerContext): A
       queue,
       handled: s.handled + 1,
       first: { ...s.first, [item.wordId]: verdict },
+      fresh: prev ? s.fresh : { ...s.fresh, [item.wordId]: verdict },
     },
     update: { progress, wasNew: !prev, prevBox: prev ? prev.box : null },
     feedback: know ? { type: 'know', days: BOX_INTERVALS[progress.box] } : { type: 'dont-first' },
@@ -95,6 +104,11 @@ export function sessionStats(s: SessionState): SessionStats {
   const verdicts = Object.values(s.first)
   const know = verdicts.filter((v) => v === 'know').length
   return { passed: verdicts.length, know, dont: verdicts.length - know }
+}
+
+export function sessionNewWords(s: SessionState): NewWordsStats {
+  const verdicts = Object.values(s.fresh)
+  return { count: verdicts.length, know: verdicts.filter((v) => v === 'know').length }
 }
 
 export function sessionProgress(s: SessionState): { done: number; total: number; left: number } {

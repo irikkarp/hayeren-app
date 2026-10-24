@@ -93,6 +93,14 @@
       <path class="st" d="M7 17Q12 14.8 17 16.5"/>
       <circle class="dot" cx="9" cy="21" r="1"/><circle class="dot" cx="13.5" cy="20" r="0.9"/><circle class="dot" cx="19" cy="21.5" r="1"/><circle class="dot" cx="24" cy="21" r="0.9"/><circle class="dot" cx="10.5" cy="12.5" r="0.9"/>
     </symbol>
+    <!-- 003: значки индикатора синхронизации (линейные, 24x24, штрих задаётся в CSS через класс si) и бумажный самолётик -->
+    <symbol id="s-synced" viewBox="0 0 24 24"><path d="M6.5 18.5a4.5 4.5 0 0 1-.6-8.96 6 6 0 0 1 11.6 1.46A3.8 3.8 0 0 1 17.5 18.5z"/><path d="M9.5 14l2 2 3.5-3.5"/></symbol>
+    <symbol id="s-syncing" viewBox="0 0 24 24"><path d="M18 9.5A6.5 6.5 0 0 0 6.2 8.5M6 14.5a6.5 6.5 0 0 0 11.8 1"/><path d="M6 4.5v4h4M18 19.5v-4h-4"/></symbol>
+    <symbol id="s-offline" viewBox="0 0 24 24"><path d="M6.5 18.5a4.5 4.5 0 0 1-.6-8.96 6 6 0 0 1 11.6 1.46A3.8 3.8 0 0 1 17.5 18.5z"/><path d="M4 4l16 16"/></symbol>
+    <symbol id="s-error" viewBox="0 0 24 24"><path d="M6.5 18.5a4.5 4.5 0 0 1-.6-8.96 6 6 0 0 1 11.6 1.46A3.8 3.8 0 0 1 17.5 18.5z"/><path d="M12 9.5v4M12 16v.01"/></symbol>
+    <symbol id="s-login" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></symbol>
+    <symbol id="s-update" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16.5V8M8 11.5l4-4 4 4"/></symbol>
+    <symbol id="i-tg" viewBox="0 0 24 24"><path d="M21.5 3.5 2.5 10.8l5.6 2.1 2 6.3 3-3.7 5 3.7z" fill="currentColor"/></symbol>
   </defs>
 </svg>
 
@@ -130,7 +138,7 @@
 
 <!-- S02 Главная, N = 7 -->
 <figure>
-<figcaption>S02 Главная: «Повторить (7)», серия 3 дня (критерии 6–8, 23–26, 38, 39, 110–112)</figcaption>
+<figcaption>S02 Главная, «смешанно»: «Повторить (7)», серия 3 дня; выучено и в изучении (критерии 6–8, 23–26, 38, 39, 110–112, 150–153)</figcaption>
 <div class="phone is-tall">
   <div class="hdr">
     <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
@@ -149,7 +157,7 @@
       <div><b>3 дня подряд</b><span class="sub">Гранат растёт: до спелого 2 дня</span></div>
     </div>
     <div class="stats" role="group" aria-label="Ваш прогресс">
-      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">26</span><span class="sub">из 88</span></div>
+      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">28 <span class="of">из 88</span></span><span class="sub"><i class="sw-i" aria-hidden="true"></i> в изучении 24</span></div>
       <div class="surface stat"><span class="label">Повторить сегодня</span><span class="t-stat">7</span><span class="sub">слов</span></div>
     </div>
 
@@ -159,11 +167,11 @@
 
     <h2 class="t-head">Темы</h2>
     <ul class="list">
-      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="muted t-small">выучено 6 из 15</span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="6" aria-label="Приветствия и вежливость: выучено 6 из 15"><span style="width:40%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
-      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-numbers"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="muted t-small">выучено 4 из 15</span><span class="progress"><span style="width:27%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="pl muted t-small"><span class="nw">выучено 6</span> · <span class="nw">в изучении 5</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="6" aria-valuetext="выучено 6, в изучении 5 из 15" aria-label="Приветствия и вежливость"><span class="seg-l" style="width:40%"></span><span class="seg-i" style="width:33.3%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-numbers"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="pl muted t-small"><span class="nw">выучено 4</span> · <span class="nw">в изучении 7</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="4" aria-valuetext="выучено 4, в изучении 7 из 15" aria-label="Числа и цены"><span class="seg-l" style="width:26.7%"></span><span class="seg-i" style="width:46.7%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
       <li><a class="row" href="#"><span class="tile"><svg class="ic ic-shop" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-shop"/></svg></span><span class="grow"><span class="name">Магазин и рынок</span><span class="muted t-small">выучено 0 из 15</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
       <li><a class="row" href="#"><span class="tile"><svg class="ic ic-transport" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-transport"/></svg></span><span class="grow"><span class="name">Транспорт и такси</span><span class="muted t-small">выучено 14 из 14</span><span class="progress"><span style="width:100%"></span></span></span><span class="chip chip-ok">✓ Выучена</span></a></li>
-      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-housing" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-housing"/></svg></span><span class="grow"><span class="name">Жильё</span><span class="muted t-small">выучено 2 из 15</span><span class="progress"><span style="width:13%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-housing" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-housing"/></svg></span><span class="grow"><span class="name">Жильё</span><span class="pl muted t-small"><span class="nw">выучено 2</span> · <span class="nw">в изучении 6</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="2" aria-valuetext="выучено 2, в изучении 6 из 15" aria-label="Жильё"><span class="seg-l" style="width:13.3%"></span><span class="seg-i" style="width:40%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
       <li><a class="row" href="#"><span class="tile"><svg class="ic ic-food" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-food"/></svg></span><span class="grow"><span class="name">Кафе и еда</span><span class="muted t-small">выучено 0 из 14</span><span class="progress"><span style="width:0"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
     </ul>
 
@@ -173,7 +181,7 @@
     </div>
     <ul class="list">
       <li class="row" style="cursor:default">
-        <a href="#" class="grow" style="text-decoration:none; color:inherit"><span class="name">Урок 5</span><span class="muted t-small">выучено 2 из 13</span><span class="progress"><span style="width:15%"></span></span></a>
+        <a href="#" class="grow" style="text-decoration:none; color:inherit"><span class="name">Урок 5</span><span class="pl muted t-small"><span class="nw">выучено 2</span> · <span class="nw">в изучении 6</span> <span class="nw">из 13</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="13" aria-valuenow="2" aria-valuetext="выучено 2, в изучении 6 из 13" aria-label="Урок 5"><span class="seg-l" style="width:15.4%"></span><span class="seg-i" style="width:46.2%"></span></span></a>
         <button class="btn btn-secondary btn-sm" type="button">Учить</button>
       </li>
     </ul>
@@ -203,7 +211,7 @@
       <div><b>Начните серию</b><span class="sub">Ответьте на любую карточку, и вырастет первый гранат</span></div>
     </div>
     <div class="stats" role="group" aria-label="Ваш прогресс">
-      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">0</span><span class="sub">из 88</span></div>
+      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">0 <span class="of">из 88</span></span><span class="sub"><i class="sw-i" aria-hidden="true"></i> в изучении 0</span></div>
       <div class="surface stat"><span class="label">Повторить сегодня</span><span class="t-stat">0</span><span class="sub">слов</span></div>
     </div>
 
@@ -360,6 +368,221 @@
     <div class="actions">
       <button class="btn btn-primary btn-block" type="button">Повторить ещё (15)</button>
       <button class="btn btn-secondary btn-block" type="button">На главную</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- ====================== Видимый прогресс (001 ред. 11, кр. 149–167) ====================== -->
+
+<!-- S02 после первой сессии, светлая -->
+<figure>
+<figcaption>S02 «после первой сессии»: 10 слов «Знаю», выучено 0, в изучении 10; «Повторить (0)» с датой (кр. 150–153, 159). Сегодня 24 октября</figcaption>
+<div class="phone is-tall">
+  <div class="hdr"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg><svg class="logo" aria-hidden="true"><use href="#bird-a"/></svg><div><h1 class="brand">Hayeren</h1><div class="brand-hy" lang="hy">Հայերեն</div></div></div>
+  <div class="screen">
+    <div class="growth" role="group" aria-label="Серия: 1 день подряд. Гранат растёт, до спелого 4 дня">
+      <div class="trees" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="22" height="22" viewBox="0 0 40 40" style="color:var(--color-border-strong)"><circle cx="20" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg></div>
+      <div><b>1 день подряд</b><span class="sub">Гранат растёт: до спелого 4 дня</span></div>
+    </div>
+    <div class="stats" role="group" aria-label="Ваш прогресс">
+      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">0 <span class="of">из 88</span></span><span class="sub"><i class="sw-i" aria-hidden="true"></i> в изучении 10</span></div>
+      <div class="surface stat"><span class="label">Повторить сегодня</span><span class="t-stat">0</span><span class="sub">слов</span><span class="sub nextrev" aria-hidden="true">Следующее повторение — послезавтра</span></div>
+    </div>
+    <div>
+      <button class="btn btn-primary btn-block" type="button" disabled aria-describedby="np-1">Повторить (0)</button>
+      <p class="repeat-note" id="np-1">Следующее повторение — послезавтра</p>
+    </div>
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="pl muted t-small"><span class="nw">выучено 0</span> · <span class="nw">в изучении 10</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" aria-valuetext="выучено 0, в изучении 10 из 15" aria-label="Приветствия и вежливость"><span class="seg-i" style="width:66.7%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-numbers"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="pl muted t-small"><span class="nw">выучено 0</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" aria-valuetext="выучено 0 из 15" aria-label="Числа и цены"></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-shop" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-shop"/></svg></span><span class="grow"><span class="name">Магазин и рынок</span><span class="pl muted t-small"><span class="nw">выучено 0</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" aria-valuetext="выучено 0 из 15" aria-label="Магазин и рынок"></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+    </ul>
+    <p class="muted t-small" style="text-align:center">Остальные темы ниже: «выучено 0 из N», бар пустой</p>
+  </div>
+</div>
+</figure>
+
+<!-- S02 после первой сессии, тёмная -->
+<figure>
+<figcaption>То же в тёмной теме (рядом, без переключателя): штриховка и контур различимы, сплошной сегмент «выучено» показан в «смешанно» ниже</figcaption>
+<div class="phone is-tall force-dark">
+  <div class="screen" style="padding-top:var(--space-4)">
+    <div class="stats" role="group" aria-label="Ваш прогресс">
+      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">3 <span class="of">из 88</span></span><span class="sub"><i class="sw-i" aria-hidden="true"></i> в изучении 7</span></div>
+      <div class="surface stat"><span class="label">Повторить сегодня</span><span class="t-stat">0</span><span class="sub">слов</span><span class="sub nextrev" aria-hidden="true">Следующее повторение — завтра</span></div>
+    </div>
+    <div>
+      <button class="btn btn-primary btn-block" type="button" disabled aria-describedby="np-2">Повторить (0)</button>
+      <p class="repeat-note" id="np-2">Следующее повторение — завтра</p>
+    </div>
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="pl muted t-small"><span class="nw">выучено 3</span> · <span class="nw">в изучении 7</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="3" aria-valuetext="выучено 3, в изучении 7 из 15" aria-label="Приветствия и вежливость"><span class="seg-l" style="width:20%"></span><span class="seg-i" style="width:46.7%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-numbers"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="pl muted t-small"><span class="nw">выучено 0</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" aria-valuetext="выучено 0 из 15" aria-label="Числа и цены"></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-food" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-food"/></svg></span><span class="grow"><span class="name">Кафе и еда</span><span class="pl muted t-small"><span class="nw">выучено 0</span> · <span class="nw">в изучении 1</span> <span class="nw">из 14</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="14" aria-valuenow="0" aria-valuetext="выучено 0, в изучении 1 из 14" aria-label="Кафе и еда"><span class="seg-i" style="width:7.1%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+    </ul>
+  </div>
+</div>
+</figure>
+
+<!-- S02 всё выучено -->
+<figure>
+<figcaption>S02 «всё выучено»: 6 из 6 тем и набор; «в изучении 0»; дата с годом, потому что год другой (кр. 150, 153, 158, 159, 163б)</figcaption>
+<div class="phone is-tall">
+  <div class="hdr"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg><svg class="logo" aria-hidden="true"><use href="#bird-a"/></svg><div><h1 class="brand">Hayeren</h1><div class="brand-hy" lang="hy">Հայերեն</div></div></div>
+  <div class="screen">
+    <div class="stats" role="group" aria-label="Ваш прогресс">
+      <div class="surface stat"><span class="label">Выучено</span><span class="t-stat">88 <span class="of">из 88</span></span><span class="sub"><i class="sw-i" aria-hidden="true"></i> в изучении 0</span></div>
+      <div class="surface stat"><span class="label">Повторить сегодня</span><span class="t-stat">0</span><span class="sub">слов</span><span class="sub nextrev" aria-hidden="true">Следующее повторение — 5 января 2027</span></div>
+    </div>
+    <div>
+      <button class="btn btn-primary btn-block" type="button" disabled aria-describedby="np-3">Повторить (0)</button>
+      <p class="repeat-note" id="np-3">Следующее повторение — 5 января 2027</p>
+    </div>
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="pl muted t-small"><span class="nw">выучено 15</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="15" aria-valuetext="выучено 15 из 15" aria-label="Приветствия и вежливость"><span class="seg-l" style="width:100%"></span></span></span><span class="chip chip-ok">✓ Выучена</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-numbers" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-numbers"/></svg></span><span class="grow"><span class="name">Числа и цены</span><span class="pl muted t-small"><span class="nw">выучено 15</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="15" aria-valuetext="выучено 15 из 15" aria-label="Числа и цены"><span class="seg-l" style="width:100%"></span></span></span><span class="chip chip-ok">✓ Выучена</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-shop" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-shop"/></svg></span><span class="grow"><span class="name">Магазин и рынок</span><span class="pl muted t-small"><span class="nw">выучено 15</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="15" aria-valuetext="выучено 15 из 15" aria-label="Магазин и рынок"><span class="seg-l" style="width:100%"></span></span></span><span class="chip chip-ok">✓ Выучена</span></a></li>
+    </ul>
+    <p class="muted t-small" style="text-align:center">Ещё три темы выглядят так же. Мои наборы: «Урок 5» «выучено 13 из 13»</p>
+  </div>
+</div>
+</figure>
+
+<!-- S02 320 px -->
+<figure>
+<figcaption>S02 на 320 px: строка прогресса переносится по смысловым кускам, не усекается (кр. 150, последний пункт). Худший случай: набор с «Учить» и большими числами</figcaption>
+<div class="phone is-tall w320" style="min-height:0">
+  <div class="screen">
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="pl muted t-small"><span class="nw">выучено 3</span> · <span class="nw">в изучении 7</span> <span class="nw">из 15</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="3" aria-valuetext="выучено 3, в изучении 7 из 15" aria-label="Приветствия и вежливость"><span class="seg-l" style="width:20%"></span><span class="seg-i" style="width:46.7%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-transport" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-transport"/></svg></span><span class="grow"><span class="name">Транспорт и такси</span><span class="pl muted t-small"><span class="nw">выучено 14</span> <span class="nw">из 14</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="14" aria-valuenow="14" aria-valuetext="выучено 14 из 14" aria-label="Транспорт и такси"><span class="seg-l" style="width:100%"></span></span></span><span class="chip chip-ok">✓ Выучена</span></a></li>
+      <li class="row" style="cursor:default">
+        <a href="#" class="grow" style="text-decoration:none; color:inherit"><span class="name">Все слова с урока</span><span class="pl muted t-small"><span class="nw">выучено 1200</span> · <span class="nw">в изучении 1500</span> <span class="nw">из 3000</span></span><span class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="3000" aria-valuenow="1200" aria-valuetext="выучено 1200, в изучении 1500 из 3000" aria-label="Все слова с урока"><span class="seg-l" style="width:40%"></span><span class="seg-i" style="width:50%"></span></span></a>
+        <button class="btn btn-secondary btn-sm" type="button">Учить</button>
+      </li>
+    </ul>
+  </div>
+</div>
+</figure>
+
+<!-- S04: после первой сессии -->
+<figure>
+<figcaption>S04 «после первой сессии»: 10 новых слов, все «Знаю»; в теме ещё 5 новых (кр. 154–156). Сегодня 24 октября</figcaption>
+<div class="phone is-tall">
+  <div class="summary">
+    <svg class="khach is-primary" width="48" height="48" aria-hidden="true"><use href="#khach"/></svg>
+    <h1 class="t-title">Хорошая работа!</h1>
+    <div class="tiles" role="group" aria-label="Итог сессии">
+      <div class="surface tile-n"><b>10</b><span>Пройдено</span></div>
+      <div class="surface tile-n"><b>10</b><span>Знаю</span></div>
+      <div class="surface tile-n"><b>0</b><span>Не знаю</span></div>
+    </div>
+    <p>Серия растёт: 1 день подряд</p>
+    <div class="explain">
+      <div>
+        <p class="lead"><i class="sw-i" aria-hidden="true"></i>Новых слов в изучении: 10.</p>
+        <p>Слово становится выученным после двух повторений: через 2 дня и ещё через 4.</p>
+      </div>
+      <div class="next">
+        <p>Следующее повторение — послезавтра.</p>
+        <p>В теме «Приветствия и вежливость» осталось 5 новых слов.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary btn-block" type="button">К темам</button>
+      <button class="btn btn-secondary btn-block" type="button">Учить ещё 10 новых слов</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- S04: смешанно -->
+<figure>
+<figcaption>S04 «смешанно»: 10 новых, 7 «Знаю» и 3 «Не знаю»; «Не знаю» возвращаются завтра (кр. 154–156)</figcaption>
+<div class="phone is-tall">
+  <div class="summary">
+    <svg class="khach is-primary" width="48" height="48" aria-hidden="true"><use href="#khach"/></svg>
+    <h1 class="t-title">Хорошая работа!</h1>
+    <div class="tiles" role="group" aria-label="Итог сессии">
+      <div class="surface tile-n"><b>10</b><span>Пройдено</span></div>
+      <div class="surface tile-n"><b>7</b><span>Знаю</span></div>
+      <div class="surface tile-n"><b>3</b><span>Не знаю</span></div>
+    </div>
+    <p>Серия растёт: 4 дня подряд</p>
+    <div class="explain">
+      <div>
+        <p class="lead"><i class="sw-i" aria-hidden="true"></i>Новых слов в изучении: 10.</p>
+        <p>Слово становится выученным после двух повторений: через 2 дня и ещё через 4.</p>
+      </div>
+      <div class="next">
+        <p>Следующее повторение — завтра.</p>
+        <p>В теме «Числа и цены» осталось 5 новых слов.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary btn-block" type="button">К темам</button>
+      <button class="btn btn-secondary btn-block" type="button">Учить ещё 10 новых слов</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- S04: всё выучено, общая сессия -->
+<figure>
+<figcaption>S04 «всё выучено»: общая сессия «Повторить», новых слов нет, слов к повторению не осталось; блок только с датой (кр. 156, 160, 158: год другой, поэтому «5 января 2027»)</figcaption>
+<div class="phone is-tall" style="min-height:0">
+  <div class="summary">
+    <svg class="khach is-primary" width="48" height="48" aria-hidden="true"><use href="#khach"/></svg>
+    <h1 class="t-title">Хорошая работа!</h1>
+    <div class="tiles" role="group" aria-label="Итог сессии">
+      <div class="surface tile-n"><b>12</b><span>Пройдено</span></div>
+      <div class="surface tile-n"><b>12</b><span>Знаю</span></div>
+      <div class="surface tile-n"><b>0</b><span>Не знаю</span></div>
+    </div>
+    <p>Серия растёт: 41 день подряд</p>
+    <div class="explain">
+      <div class="next" style="border-top:0; padding-top:0">
+        <p>Следующее повторение — 5 января 2027.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary btn-block" type="button">На главную</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- S04 тёмная: все «Не знаю» -->
+<figure>
+<figcaption>S04 в тёмной теме, вариант «все 10 новых — Не знаю»: схема не обещается, дата ближайшего повторения «завтра» (кр. 154, третий пункт)</figcaption>
+<div class="phone is-tall force-dark">
+  <div class="summary">
+    <svg class="khach is-primary" width="48" height="48" aria-hidden="true"><use href="#khach"/></svg>
+    <h1 class="t-title">Хорошая работа!</h1>
+    <div class="tiles" role="group" aria-label="Итог сессии">
+      <div class="surface tile-n"><b>10</b><span>Пройдено</span></div>
+      <div class="surface tile-n"><b>0</b><span>Знаю</span></div>
+      <div class="surface tile-n"><b>10</b><span>Не знаю</span></div>
+    </div>
+    <p>Серия растёт: 1 день подряд</p>
+    <div class="explain">
+      <div>
+        <p class="lead"><i class="sw-i" aria-hidden="true"></i>Новых слов в изучении: 10.</p>
+        <p>Выученными слова станут после нескольких успешных повторений.</p>
+      </div>
+      <div class="next">
+        <p>Следующее повторение — завтра.</p>
+        <p>В теме «Приветствия и вежливость» осталось 5 новых слов.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary btn-block" type="button">К темам</button>
+      <button class="btn btn-secondary btn-block" type="button">Учить ещё 10 новых слов</button>
     </div>
   </div>
 </div>
@@ -595,6 +818,433 @@ shuka — рынок
     <div style="text-align:center"><svg class="ic ic-transport" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-transport"/></svg><span class="t-caption">Транспорт</span></div>
     <div style="text-align:center"><svg class="ic ic-housing" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-housing"/></svg><span class="t-caption">Жильё</span></div>
     <div style="text-align:center"><svg class="ic ic-food" viewBox="0 0 32 32" aria-hidden="true" style="width:96px;height:96px"><use href="#i-food"/></svg><span class="t-caption">Еда (лаваш)</span></div>
+  </div>
+</div>
+</figure>
+
+<!-- ====================================================================== -->
+<!-- 003. АККАУНТЫ И СИНХРОНИЗАЦИЯ (docs/design/003-accounts.md)             -->
+<!-- Прототипы не рендерились автоматически; проверять в браузере в обеих темах (кнопка «Тема»). -->
+<!-- ====================================================================== -->
+<h2 class="t-title" style="width:100%; text-align:center; margin:16px 0 0">003 · Аккаунты и синхронизация</h2>
+
+<!-- A1 Настройки, гость -->
+<figure>
+<figcaption>A1 Настройки → «Аккаунт», гость (003: 2, 8, 65, 74)</figcaption>
+<div class="phone is-tall">
+  <div class="appbar"><h1>Настройки</h1></div>
+  <div class="screen">
+    <h2 class="t-head">Режим занятий</h2>
+    <p class="muted t-small">Учу с нуля · транслитерация видна сразу (разделы без изменений)</p>
+
+    <h2 class="t-head">Аккаунт</h2>
+    <div class="field">
+      <p>Войдите, чтобы слова и прогресс не пропали при смене телефона и были на всех ваших устройствах.</p>
+      <button class="btn btn-primary btn-block" type="button" aria-describedby="a1-note"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Войти через Telegram</button>
+      <p class="hint" id="a1-note">Вход не обязателен. Без него всё работает на этом устройстве</p>
+    </div>
+
+    <h2 class="t-head">Резервная копия</h2>
+    <p class="t-small muted">В файл попадут наборы, слова, переводы, транслитерация и примеры. Прогресс повторения не сохраняется…</p>
+    <button class="btn btn-secondary btn-block" type="button">Экспортировать все свои слова</button>
+    <div class="banner banner-info"><div>Свои слова хранятся только в этом браузере на этом устройстве. Если очистить данные браузера или удалить приложение, они пропадут. Сохраните резервную копию. <b>Или войдите, чтобы хранить их в аккаунте.</b> <a href="#" style="color:var(--color-primary)">Войти</a></div></div>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#"><span class="hy-l" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<!-- A1b Настройки, гость, нет сети -->
+<figure>
+<figcaption>A1 · состояние без сети: кнопка недоступна, причина текстом (003: 8)</figcaption>
+<div class="phone is-tall" style="min-height:0">
+  <div class="appbar"><h1>Настройки</h1></div>
+  <div class="screen">
+    <h2 class="t-head">Аккаунт</h2>
+    <div class="field">
+      <p>Войдите, чтобы слова и прогресс не пропали при смене телефона и были на всех ваших устройствах.</p>
+      <button class="btn btn-primary btn-block" type="button" disabled aria-describedby="a1b-note"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Войти через Telegram</button>
+      <p class="hint" id="a1b-note">Для входа нужна сеть. Вход не обязателен: без него всё работает на этом устройстве</p>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- A2 Настройки, вошёл -->
+<figure>
+<figcaption>A2 Настройки → «Аккаунт», вошёл, синхронизировано (003: 11, 12, 13, 40, 41, 65)</figcaption>
+<div class="phone is-tall">
+  <div class="appbar"><h1>Настройки</h1></div>
+  <div class="screen">
+    <h2 class="t-head">Режим занятий</h2>
+    <p class="muted t-small">Учу с нуля · транслитерация видна сразу (без изменений)</p>
+
+    <h2 class="t-head">Аккаунт</h2>
+    <div class="account-head">
+      <span class="avatar is-lg" aria-hidden="true">И</span>
+      <div class="who"><span class="nm">Ирина</span><span class="muted t-small">Вход через Telegram</span></div>
+    </div>
+    <div class="sync-row is-ok" role="status">
+      <svg class="si" aria-hidden="true" focusable="false"><use href="#s-synced"/></svg>
+      <div class="txt"><span>Синхронизировано: сегодня, 14:05</span></div>
+    </div>
+    <button class="btn btn-secondary btn-block" type="button">Синхронизировать сейчас</button>
+    <button class="btn btn-secondary btn-block" type="button">Выйти</button>
+    <div style="border-top:1px solid var(--color-divider); padding-top:var(--space-2)">
+      <button class="btn btn-danger-text" type="button">Удалить аккаунт</button>
+    </div>
+
+    <h2 class="t-head">Резервная копия</h2>
+    <button class="btn btn-secondary btn-block" type="button">Экспортировать все свои слова</button>
+    <div class="banner banner-info"><div>Свои слова сохраняются в вашем аккаунте и на этом устройстве. Экспорт даёт ещё одну копию в файле.</div></div>
+  </div>
+  <nav class="tabbar" aria-label="Основная навигация">
+    <a class="tab" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Главная</a>
+    <a class="tab" href="#"><span class="hy-l" lang="hy" aria-hidden="true">Ա</span>Алфавит</a>
+    <a class="tab" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Настройки</a>
+  </nav>
+</div>
+</figure>
+
+<!-- A6 Индикатор: шесть состояний -->
+<figure>
+<figcaption>A6 Индикатор синхронизации: шесть состояний. Сверху компактный в шапке главной, ниже строка в «Аккаунте» (003: 40–43, 67–69)</figcaption>
+<div class="phone is-tall">
+  <div class="screen" style="gap:12px">
+
+    <p class="t-caption muted">1. Синхронизировано (в шапке только значок, без текста)</p>
+    <div class="hdr" style="min-height:56px; padding:6px 16px"><svg class="logo" aria-hidden="true" style="width:36px;height:35px"><use href="#bird-a"/></svg><div class="brand" style="font-size:22px">Hayeren</div>
+      <a class="sync-chip" href="#" aria-label="Синхронизировано: сегодня, 14:05. Открыть настройки аккаунта"><span class="in"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-synced"/></svg></span></a></div>
+    <div class="sync-row is-ok"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-synced"/></svg><div class="txt"><span>Синхронизировано: сегодня, 14:05</span></div></div>
+
+    <p class="t-caption muted">2. Идёт обмен (виден, только если длится больше 1 с)</p>
+    <div class="hdr" style="min-height:56px; padding:6px 16px"><svg class="logo" aria-hidden="true" style="width:36px;height:35px"><use href="#bird-a"/></svg><div class="brand" style="font-size:22px">Hayeren</div>
+      <a class="sync-chip" href="#" aria-label="Синхронизация. Открыть настройки аккаунта"><span class="in"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-syncing"/></svg></span></a></div>
+    <div class="sync-row"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-syncing"/></svg><div class="txt"><span>Синхронизация…</span></div></div>
+
+    <p class="t-caption muted">3. Ждёт сети (N = 3)</p>
+    <div class="hdr" style="min-height:56px; padding:6px 16px"><svg class="logo" aria-hidden="true" style="width:36px;height:35px"><use href="#bird-a"/></svg><div class="brand" style="font-size:22px">Hayeren</div>
+      <a class="sync-chip is-warn" href="#" aria-label="Нет сети. Изменения (3) отправятся позже. Открыть настройки аккаунта"><span class="in"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-offline"/></svg>Нет сети</span></a></div>
+    <div class="sync-row is-warn"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-offline"/></svg><div class="txt"><span>Нет сети. Изменения (3) отправятся позже</span></div></div>
+
+    <p class="t-caption muted">4. Ошибка, повторим</p>
+    <div class="hdr" style="min-height:56px; padding:6px 16px"><svg class="logo" aria-hidden="true" style="width:36px;height:35px"><use href="#bird-a"/></svg><div class="brand" style="font-size:22px">Hayeren</div>
+      <a class="sync-chip is-warn" href="#" aria-label="Не получилось синхронизировать. Попробуем снова. Открыть настройки аккаунта"><span class="in"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-error"/></svg>Повторим</span></a></div>
+    <div class="sync-row is-warn"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-error"/></svg><div class="txt"><span>Не получилось синхронизировать. Попробуем снова. Данные сохранены на устройстве</span></div></div>
+
+    <p class="t-caption muted">5. Нужен вход</p>
+    <div class="hdr" style="min-height:56px; padding:6px 16px"><svg class="logo" aria-hidden="true" style="width:36px;height:35px"><use href="#bird-a"/></svg><div class="brand" style="font-size:22px">Hayeren</div>
+      <a class="sync-chip is-warn" href="#" aria-label="Нужно войти снова. Открыть настройки аккаунта"><span class="in"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-login"/></svg>Войти снова</span></a></div>
+    <div class="sync-row is-warn"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-login"/></svg><div class="txt"><span>Нужно войти снова</span><button class="btn btn-primary btn-sm" type="button"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Войти через Telegram</button></div></div>
+
+    <p class="t-caption muted">6. Нужно обновить приложение</p>
+    <div class="hdr" style="min-height:56px; padding:6px 16px"><svg class="logo" aria-hidden="true" style="width:36px;height:35px"><use href="#bird-a"/></svg><div class="brand" style="font-size:22px">Hayeren</div>
+      <a class="sync-chip is-warn" href="#" aria-label="Обновите приложение, чтобы продолжить синхронизацию. Открыть настройки аккаунта"><span class="in"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-update"/></svg>Обновить</span></a></div>
+    <div class="sync-row is-warn"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-update"/></svg><div class="txt"><span>Обновите приложение, чтобы продолжить синхронизацию</span><button class="btn btn-primary btn-sm" type="button">Обновить</button></div></div>
+  </div>
+</div>
+</figure>
+
+<!-- A3 Вход -->
+<figure>
+<figcaption>A3 Вход: политика видна без прокрутки, кнопка Telegram (003: 5, 59, 74). Проверять на 320×568</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Вход</h1></div>
+  <div class="screen" style="gap:12px">
+    <h2 class="t-title">Сохраните слова и прогресс в аккаунте</h2>
+    <div class="banner banner-info" role="note"><div>Слова и прогресс с этого устройства сохранятся в аккаунте</div></div>
+    <div class="policy">
+      <p class="ph">Что мы сохраняем</p>
+      <p>Ваш Telegram-ID, имя и фото профиля, а также ваши слова, наборы, прогресс и серию. Пароль не нужен, сообщения и контакты в Telegram мы не видим. Рекламы и аналитики нет. Аккаунт можно удалить в любой момент.</p>
+      <details>
+        <summary>Подробнее</summary>
+        <p>Данные хранятся на сервере владельца приложения и никому не передаются. На сервере всё стирается сразу, из резервных копий исчезает в течение 14 дней.</p>
+        <p>Без входа приложение работает как раньше, всё только на вашем устройстве. Вопросы: &lt;контакт владельца&gt;.</p>
+      </details>
+    </div>
+  </div>
+  <div class="stickybar">
+    <button class="btn btn-telegram btn-block" type="button"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Продолжить в Telegram</button>
+    <button class="btn btn-secondary btn-block" type="button">Не сейчас</button>
+  </div>
+</div>
+</figure>
+
+<!-- A3b Вход: ошибки -->
+<figure>
+<figcaption>A3 · состояния: нет сети, сервер не отвечает, вход не завершён (003: 7, 8, 10, 67)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Вход</h1></div>
+  <div class="screen" style="gap:12px">
+    <div class="banner banner-warn" role="status"><span aria-hidden="true">⚠</span><div>Вход не завершён. Попробуйте ещё раз</div></div>
+    <div class="banner banner-err" role="alert"><span aria-hidden="true">⚠</span><div>Не удалось войти. Попробуйте ещё раз</div></div>
+    <div class="banner banner-err" role="alert"><span aria-hidden="true">⚠</span><div>Сервер не отвечает. Попробуйте позже. Приложение работает без входа</div></div>
+    <p class="t-caption muted">Без сети кнопка недоступна, причина рядом:</p>
+    <div>
+      <button class="btn btn-telegram btn-block" type="button" disabled aria-describedby="a3-off"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Продолжить в Telegram</button>
+      <p class="repeat-note" id="a3-off">Для входа нужна сеть</p>
+    </div>
+    <p class="t-caption muted">Хранилище браузера недоступно:</p>
+    <div>
+      <button class="btn btn-telegram btn-block" type="button" disabled aria-describedby="a3-st"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Продолжить в Telegram</button>
+      <p class="repeat-note" id="a3-st">Для входа нужно хранилище браузера</p>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- A4 Ожидание -->
+<figure>
+<figcaption>A4 Вход: ждём подтверждения в Telegram, запасная ссылка и QR-код (003: 6, 7)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Отменить вход">‹</button><h1>Вход через Telegram</h1></div>
+  <div class="screen" style="gap:12px">
+    <div class="wait-card">
+      <h2 class="t-heading" role="status">Ждём подтверждения в Telegram…</h2>
+      <p class="t-small">В чате с ботом нажмите «Start», затем вернитесь сюда. Вход завершится сам.</p>
+      <div class="progress" aria-hidden="true"><span style="width:86%"></span></div>
+      <p class="t-small muted">Осталось 4:18</p>
+      <a class="btn btn-secondary btn-block" href="#">Открыть Telegram ещё раз</a>
+    </div>
+    <div class="policy">
+      <p class="ph">Telegram не открылся? Откройте ссылку вручную</p>
+      <p>Ссылку можно открыть на другом устройстве, где есть Telegram. Вход завершится здесь.</p>
+      <button class="btn btn-secondary btn-block" type="button" style="margin-top:8px">Скопировать ссылку</button>
+      <details>
+        <summary>Показать QR-код</summary>
+        <p>Наведите камеру телефона, откроется Telegram. Нажмите «Start» и вернитесь к этому окну.</p>
+        <!-- Заглушка: настоящий QR строится в приложении локально (без внешних запросов). Всегда тёмный на светлом, в обеих темах. -->
+        <svg class="qr" viewBox="0 0 25 25" role="img" aria-label="QR-код со ссылкой для входа" shape-rendering="crispEdges">
+          <rect width="25" height="25" fill="#FFFFFF"/>
+          <g fill="#1A1A1A">
+            <path d="M2 2h7v7H2zM16 2h7v7h-7zM2 16h7v7H2z"/>
+            <path d="M3 3h5v5H3zM17 3h5v5h-5zM3 17h5v5H3z" fill="#FFFFFF"/>
+            <path d="M4 4h3v3H4zM18 4h3v3h-3zM4 18h3v3H4z"/>
+            <path d="M11 2h2v2h-2zM11 5h3v2h-3zM10 9h2v2h-2zM13 9h3v2h-3zM2 11h3v2H2zM7 11h2v3H7zM12 12h2v2h-2zM16 12h3v2h-3zM20 11h3v3h-3zM11 15h3v2h-3zM16 16h2v3h-2zM19 18h4v2h-4zM12 19h3v2h-3zM17 21h3v2h-3zM10 22h2v1h-2z"/>
+          </g>
+        </svg>
+      </details>
+    </div>
+  </div>
+  <div class="stickybar">
+    <button class="btn btn-secondary btn-block" type="button">Отмена</button>
+  </div>
+</div>
+</figure>
+
+<!-- A4b Код: ошибка -->
+<figure>
+<figcaption>A4 · состояния: ссылка скопирована, последние секунды, нет сети (003: 6, 7)</figcaption>
+<div class="phone is-tall" style="min-height:0">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Отменить вход">‹</button><h1>Вход через Telegram</h1></div>
+  <div class="screen" style="gap:12px">
+    <div class="banner banner-ok" role="status"><div style="flex:1">Ссылка скопирована</div><button class="btn btn-text" type="button">Закрыть</button></div>
+    <div class="banner banner-warn" role="status"><span aria-hidden="true">⚠</span><div>Код скоро истечёт. Осталось 0:25</div></div>
+    <div class="banner banner-warn" role="status"><span aria-hidden="true">⚠</span><div>Нет сети. Продолжим, когда она появится</div></div>
+  </div>
+</div>
+</figure>
+
+<!-- A5 Главная с карточкой -->
+<figure>
+<figcaption>A5 Главная: мягкое предложение входа + индикатор в шапке (003: 3, 4, 40)</figcaption>
+<div class="phone is-tall">
+  <div class="hdr">
+    <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
+    <svg class="logo" aria-hidden="true"><use href="#bird-a"/></svg>
+    <div><h1 class="brand">Hayeren</h1><div class="brand-hy" lang="hy">Հայերեն</div></div>
+  </div>
+  <div class="screen">
+    <div class="growth" role="group" aria-label="Серия: 3 дня подряд. Гранат растёт, до спелого 2 дня">
+      <div class="trees" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="22" height="22" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="28" height="28" viewBox="0 0 40 40"><use href="#pom"/></svg>
+        <svg width="26" height="26" viewBox="0 0 40 40" style="color:var(--color-border-strong)"><circle cx="20" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg>
+        <svg width="26" height="26" viewBox="0 0 40 40" style="color:var(--color-border-strong)"><circle cx="20" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg>
+      </div>
+      <div><b>3 дня подряд</b><span class="sub">Гранат растёт: до спелого 2 дня</span></div>
+    </div>
+    <div>
+      <button class="btn btn-primary btn-block" type="button">Повторить (7)</button>
+    </div>
+    <section class="offer" aria-labelledby="offer-t">
+      <div class="top">
+        <svg class="khach" width="32" height="32" aria-hidden="true"><use href="#khach"/></svg>
+        <div>
+          <h2 class="ttl" id="offer-t">Сохраните прогресс и слова в аккаунте</h2>
+          <p class="t-small muted">Вы занимаетесь уже 3 дня. В аккаунте всё сохранится при смене телефона.</p>
+        </div>
+      </div>
+      <div class="acts">
+        <button class="btn btn-primary" type="button"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Войти через Telegram</button>
+        <button class="btn btn-text" type="button">Не сейчас</button>
+      </div>
+    </section>
+    <h2 class="t-head">Темы</h2>
+    <ul class="list">
+      <li><a class="row" href="#"><span class="tile"><svg class="ic ic-greetings" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-greetings"/></svg></span><span class="grow"><span class="name">Приветствия и вежливость</span><span class="muted t-small">выучено 6 из 15</span><span class="progress"><span style="width:40%"></span></span></span><span class="chev" aria-hidden="true">›</span></a></li>
+    </ul>
+  </div>
+</div>
+</figure>
+
+<!-- A5b Главная: вошёл, разовые сообщения -->
+<figure>
+<figcaption>A11 Главная: разовые сообщения вверху экрана (003: 46, 63, 68, 70, 72). Показывается по одному</figcaption>
+<div class="phone is-tall">
+  <div class="hdr">
+    <svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#arev)"/></svg>
+    <svg class="logo" aria-hidden="true"><use href="#bird-a"/></svg>
+    <div><h1 class="brand">Hayeren</h1><div class="brand-hy" lang="hy">Հայերեն</div></div>
+    <a class="sync-chip is-warn" href="#" aria-label="Нужно войти снова. Открыть настройки аккаунта"><span class="in"><svg class="si" aria-hidden="true" focusable="false"><use href="#s-login"/></svg>Войти снова</span></a>
+  </div>
+  <div class="screen">
+    <div class="banner banner-warn" role="status"><div style="display:flex;flex-direction:column;gap:8px"><span><b>Нужно войти снова.</b> Слова и прогресс на этом устройстве сохранены.</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" type="button"><svg class="tg" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Войти через Telegram</button><button class="btn btn-text" type="button">Закрыть</button></span></div></div>
+    <div class="banner banner-info" role="status"><div style="flex:1">Аккаунт удалён. Данные остались на этом устройстве</div><button class="btn btn-text" type="button">Закрыть</button></div>
+    <div class="banner banner-warn" role="status"><div style="flex:1">Достигнут лимит: 3000 слов / 100 наборов. Часть изменений не сохранена в аккаунте</div><button class="btn btn-text" type="button">Закрыть</button></div>
+    <div class="banner banner-warn" role="status"><div style="flex:1">Часы на устройстве идут неправильно (на 12 мин). Из-за этого синхронизация может работать неточно. Проверьте дату и время</div><button class="btn btn-text" type="button">Закрыть</button></div>
+    <div class="banner banner-ok" role="status"><div style="flex:1">Вы вошли как Ирина</div><button class="btn btn-text" type="button">Закрыть</button></div>
+    <p class="muted t-small">Дальше обычная главная.</p>
+  </div>
+</div>
+</figure>
+
+<!-- A7 Данные другого аккаунта -->
+<figure>
+<figcaption>A7 Данные другого аккаунта: три действия, ни одно не выбрано (003: 47, 52)</figcaption>
+<div class="phone">
+  <div class="appbar"><h1>Вход</h1></div>
+  <div class="screen" style="gap:12px">
+    <h2 class="t-title">На этом устройстве данные другого аккаунта</h2>
+    <p>Раньше здесь был вход под другим аккаунтом. Вы продолжаете со своими данными или это чужие?</p>
+    <div class="surface" style="padding:12px 14px" role="group" aria-label="Данные на устройстве">
+      <span class="t-caption muted">На устройстве</span><br>
+      <span class="t-body"><b>своих слов 42, слов с прогрессом 31</b></span><br>
+      <span class="t-caption muted">Вы вошли как Ирина</span>
+    </div>
+    <button class="choice" type="button"><span class="t-heading">Это мои данные: объединить с аккаунтом</span><span class="muted t-small">Слова и прогресс с устройства добавятся к данным аккаунта</span></button>
+    <button class="choice" type="button"><span class="t-heading">Это не мои данные: удалить их с устройства</span><span class="muted t-small">Данные на устройстве будут удалены, скачаются данные аккаунта</span></button>
+    <button class="btn btn-secondary btn-block" type="button">Отмена</button>
+  </div>
+</div>
+</figure>
+
+<!-- A7b Подтверждение удаления -->
+<figure>
+<figcaption>A7 · подтверждение удаления локальных данных, с экспортом (003: 52)</figcaption>
+<div class="phone">
+  <div class="appbar"><h1>Вход</h1></div>
+  <div class="screen"><p class="muted">Экран выбора (под затемнением)</p></div>
+  <div class="scrim">
+    <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="a7-t" aria-describedby="a7-d">
+      <h2 id="a7-t" class="t-heading">Удалить с этого устройства 42 своих слова и прогресс по 31 слову?</h2>
+      <p id="a7-d">Это нельзя отменить. Их можно сначала сохранить файлом.</p>
+      <button class="btn btn-danger btn-block" type="button">Удалить</button>
+      <button class="btn btn-secondary btn-block" type="button">Экспортировать слова</button>
+      <button class="btn btn-secondary btn-block" type="button" autofocus>Отмена</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- A7c Лимит -->
+<figure>
+<figcaption>A7 · лимит после объединения (003: 37, 51)</figcaption>
+<div class="phone is-tall" style="min-height:0">
+  <div class="appbar"><h1>Вход</h1></div>
+  <div class="screen" style="gap:12px">
+    <h2 class="t-title">Слишком много слов для объединения</h2>
+    <div class="banner banner-warn" role="alert"><span aria-hidden="true">⚠</span><div>После объединения получится больше 3000 слов (3184). Удалите лишнее на одном из устройств или оставьте данные аккаунта</div></div>
+    <button class="btn btn-secondary btn-block" type="button">Оставить данные аккаунта</button>
+    <button class="btn btn-secondary btn-block" type="button">Отмена</button>
+  </div>
+</div>
+</figure>
+
+<!-- A8 Итог входа -->
+<figure>
+<figcaption>A8 Итог первого входа: перенос и слияние (003: 46)</figcaption>
+<div class="phone">
+  <div class="summary">
+    <svg class="khach is-primary" width="48" height="48" aria-hidden="true"><use href="#khach"/></svg>
+    <h1 class="t-title">Готово</h1>
+    <p>В аккаунте теперь всё, что было на этом устройстве</p>
+    <div class="tiles tiles-2">
+      <div class="surface tile-n"><b>2</b><span>своих набора</span></div>
+      <div class="surface tile-n"><b>42</b><span>своих слова</span></div>
+      <div class="surface tile-n"><b>31</b><span>слово с прогрессом</span></div>
+      <div class="surface tile-n"><b>3</b><span>дня серии</span></div>
+    </div>
+    <div class="banner banner-info" style="width:100%; text-align:left"><div>Объединено с данными аккаунта</div></div>
+    <div class="actions"><button class="btn btn-primary btn-block" type="button">Хорошо</button></div>
+  </div>
+</div>
+</figure>
+
+<!-- A9 Выход -->
+<figure>
+<figcaption>A9 Диалог выхода: по умолчанию «удалить данные с устройства» (003: 53, 55, 56)</figcaption>
+<div class="phone">
+  <div class="appbar"><h1>Настройки</h1></div>
+  <div class="screen"><p class="muted">Настройки (под затемнением)</p></div>
+  <div class="scrim">
+    <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="a9-t">
+      <h2 id="a9-t" class="t-heading">Выйти из аккаунта?</h2>
+      <div role="radiogroup" aria-labelledby="a9-t" style="display:flex;flex-direction:column;gap:8px">
+        <label class="radio-row"><input type="radio" name="out" checked><span class="t"><b>Выйти и удалить данные с этого устройства</b><span class="t-small muted">Слова и прогресс останутся в аккаунте. Здесь ничего не останется</span></span></label>
+        <label class="radio-row"><input type="radio" name="out"><span class="t"><b>Выйти и оставить данные здесь</b><span class="t-small muted">Данные останутся на устройстве без аккаунта. Если здесь войдёт другой человек, мы спросим, чьи это данные</span></span></label>
+      </div>
+      <button class="btn btn-danger btn-block" type="button">Выйти и удалить данные</button>
+      <button class="btn btn-secondary btn-block" type="button" autofocus>Отмена</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- A9b Неотправленные -->
+<figure>
+<figcaption>A9 · есть неотправленные изменения при выходе с удалением (003: 54)</figcaption>
+<div class="phone">
+  <div class="appbar"><h1>Настройки</h1></div>
+  <div class="screen"><p class="muted">Настройки (под затемнением)</p></div>
+  <div class="scrim">
+    <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="a9b-t" aria-describedby="a9b-d">
+      <h2 id="a9b-t" class="t-heading">Не отправлено изменений: 5</h2>
+      <p id="a9b-d">Если удалить данные сейчас, они пропадут. Можно сначала сохранить слова файлом или дождаться сети.</p>
+      <button class="btn btn-danger btn-block" type="button">Всё равно удалить</button>
+      <button class="btn btn-secondary btn-block" type="button">Экспортировать слова</button>
+      <button class="btn btn-secondary btn-block" type="button" autofocus>Отмена</button>
+    </div>
+  </div>
+</div>
+</figure>
+
+<!-- A10 Удаление аккаунта -->
+<figure>
+<figcaption>A10 Удаление аккаунта: ввод подтверждения (003: 60–62; ввод слова — по поручению контролёра, см. вопрос 1)</figcaption>
+<div class="phone">
+  <div class="appbar"><button class="icon-btn" type="button" aria-label="Назад">‹</button><h1>Удалить аккаунт</h1></div>
+  <div class="screen" style="gap:12px">
+    <h2 class="t-title">Удалить аккаунт и все данные на сервере?</h2>
+    <p>Будут удалены имя, Telegram-ID и все ваши слова, наборы, прогресс и серия на сервере.</p>
+    <ul class="steps" style="padding-left:20px">
+      <li>Данные на этом устройстве останутся.</li>
+      <li>На других устройствах после следующей синхронизации вы выйдете из аккаунта, данные там тоже останутся.</li>
+      <li>Из резервных копий данные исчезнут в течение 14 дней.</li>
+    </ul>
+    <div class="field">
+      <label for="a10-in">Чтобы подтвердить, введите слово «удалить»</label>
+      <input id="a10-in" class="input" value="удалить" autocomplete="off" autocapitalize="none" spellcheck="false">
+    </div>
+  </div>
+  <div class="stickybar">
+    <button class="btn btn-danger btn-block" type="button">Удалить навсегда</button>
+    <button class="btn btn-secondary btn-block" type="button">Экспортировать слова</button>
+    <button class="btn btn-secondary btn-block" type="button">Отмена</button>
   </div>
 </div>
 </figure>

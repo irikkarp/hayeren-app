@@ -5,6 +5,7 @@ import {
   dropMissing,
   feedbackText,
   isFinished,
+  sessionNewWords,
   sessionProgress,
   sessionStats,
   type SessionState,
@@ -138,7 +139,7 @@ function Run({
   function finish(s: SessionState, stopped: boolean) {
     if (finished.current) return
     finished.current = true
-    store.finishSession(target, sessionStats(s), stopped, streakBefore)
+    store.finishSession(target, sessionStats(s), sessionNewWords(s), stopped, streakBefore)
     navigate('/session/result', { replace: true })
   }
 

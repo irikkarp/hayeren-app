@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
 import { wordsWord } from '../domain/plural'
 import { SESSION_DUE_LIMIT } from '../domain/queue'
-import { countDue, hasAnyProgress, learnedCount, topicProgress } from '../domain/stats'
+import { nextReviewDate, noDueText, progressCounts } from '../domain/progress'
+import { countDue } from '../domain/stats'
 import { streakView } from '../domain/streak'
 import { navigate } from '../router'
 import { useAppState, useStore } from '../store/context'
 import { Bird, Pattern, Pomegranate, PomegranateOutline, TopicIcon } from '../ui/Icons'
-import { Progress } from '../ui/Progress'
+import { ProgressBar, ProgressLine } from '../ui/Progress'
 import { MySetsSection } from './MySets'
 
 const POM_SIZES = [16, 22, 28, 34, 40]
@@ -47,15 +48,14 @@ export function Home() {
 
   // N на плитке и на кнопке: одно и то же значение из одной функции (критерий 112).
   const due = useMemo(() => countDue(catalog, progress, today), [catalog, progress, today])
-  const learned = useMemo(() => learnedCount(catalog, progress), [catalog, progress])
-  const anyProgress = useMemo(() => hasAnyProgress(catalog, progress), [catalog, progress])
+  const all = useMemo(() => progressCounts(catalog.words, progress), [catalog, progress])
+  // Дата ближайшего повторения: одно значение для плитки и для текста у кнопки (критерий 159).
+  const nextDate = useMemo(() => nextReviewDate(catalog.words, progress), [catalog, progress])
   const streak = store.streak(state)
 
   const note =
     due === 0
-      ? anyProgress
-        ? 'На сегодня всё повторено'
-        : 'Пока нечего повторять: начните с любой темы'
+      ? noDueText(nextDate, today)
       : due > SESSION_DUE_LIMIT
         ? 'В сессии 30 слов, остальные — в следующей'
         : null
@@ -85,13 +85,22 @@ export function Home() {
         <div className="stats" role="group" aria-label="Ваш прогресс">
           <div className="surface stat">
             <span className="label">Выучено</span>
-            <span className="t-stat">{learned}</span>
-            <span className="sub">из {catalog.words.length}</span>
+            <span className="t-stat">
+              {all.learned} <span className="of">из {all.total}</span>
+            </span>
+            <span className="sub">
+              <i className="sw-i" aria-hidden="true" /> в изучении {all.learning}
+            </span>
           </div>
           <div className="surface stat">
             <span className="label">Повторить сегодня</span>
             <span className="t-stat">{due}</span>
             <span className="sub">{wordsWord(due)}</span>
+            {due === 0 && nextDate !== null && (
+              <span className="sub nextrev" aria-hidden="true">
+                {note}
+              </span>
+            )}
           </div>
         </div>
 
@@ -115,7 +124,7 @@ export function Home() {
         <h2 className="t-head">Темы</h2>
         <ul className="list">
           {catalog.topics.map((topic) => {
-            const p = topicProgress(catalog, topic.id, progress)
+            const p = progressCounts(catalog.topicWords(topic.id), progress)
             return (
               <li key={topic.id}>
                 <a className="row" href={`#/session/topic/${topic.id}`}>
@@ -124,16 +133,10 @@ export function Home() {
                   </span>
                   <span className="grow">
                     <span className="name">{topic.title_ru}</span>
-                    <span className="muted t-small">
-                      выучено {p.learned} из {p.total}
-                    </span>
-                    <Progress
-                      value={p.learned}
-                      max={p.total}
-                      label={`Выучено ${p.learned} из ${p.total}`}
-                    />
+                    <ProgressLine counts={p} />
+                    <ProgressBar counts={p} label={topic.title_ru} />
                   </span>
-                  {p.isLearned ? (
+                  {p.total > 0 && p.learned === p.total ? (
                     <span className="chip chip-ok">✓ Выучена</span>
                   ) : (
                     <span className="chev" aria-hidden="true">

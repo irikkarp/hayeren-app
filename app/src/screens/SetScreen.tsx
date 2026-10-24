@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { addPath } from '../domain/router'
 import { wordsWord } from '../domain/plural'
-import { setProgress } from '../domain/stats'
+import { progressCounts } from '../domain/progress'
 import { STATUS_LABEL, wordStatus } from '../domain/userWords'
 import { navigate } from '../router'
 import { useAppState, useStore } from '../store/context'
@@ -12,6 +12,7 @@ import { ExportStatus } from '../ui/ExportStatus'
 import { useExport } from '../ui/useExport'
 import { ExportButton } from '../ui/ExportButton'
 import { Khachkar } from '../ui/Icons'
+import { ProgressBar, ProgressLine } from '../ui/Progress'
 import { Redirect } from '../ui/Redirect'
 import { RenameDialog } from '../ui/RenameDialog'
 import { TopBar } from '../ui/TopBar'
@@ -29,7 +30,7 @@ export function SetScreen({ setId }: { setId: string }) {
 
   const catalog = store.getCatalog()
   const words = catalog.setWords(setId)
-  const p = setProgress(catalog, setId, progress)
+  const p = progressCounts(words, progress)
   const hasAuto = words.some((w) => w.translitAuto)
   const addHref = `#${addPath('', setId)}`
 
@@ -60,9 +61,14 @@ export function SetScreen({ setId }: { setId: string }) {
     <>
       <TopBar title={set.title} onBack={() => navigate('/')} />
       <main className="screen">
-        <p>
-          {p.total === 0 ? '0 слов' : `${p.total} ${wordsWord(p.total)} · выучено ${p.learned}`}
-        </p>
+        {p.total === 0 ? (
+          <p>0 слов</p>
+        ) : (
+          <div className="stack set-summary">
+            <ProgressLine counts={p} />
+            <ProgressBar counts={p} label="Прогресс по набору" />
+          </div>
+        )}
 
         {p.total > 0 && (
           <a

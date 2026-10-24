@@ -256,7 +256,9 @@ test.describe('Данные и сеть (29, 31)', () => {
       ],
     })
     await expect(page.getByRole('button', { name: 'Повторить (1)' })).toBeEnabled()
-    await expect(page.locator('.stat', { hasText: 'Выучено' }).locator('.t-stat')).toHaveText('1')
+    await expect(page.locator('.stat', { hasText: 'Выучено' }).locator('.t-stat')).toHaveText(
+      '1 из 88',
+    )
     await page.getByRole('button', { name: 'Повторить (1)' }).click()
     await know(page)
     await expect(page.getByRole('heading', { name: 'Хорошая работа!' })).toBeVisible()

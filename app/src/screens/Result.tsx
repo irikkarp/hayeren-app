@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { pickNextTopic } from '../domain/celebration'
 import { daysWord } from '../domain/plural'
 import { canLearnMore, SESSION_DUE_LIMIT } from '../domain/queue'
-import { countDue, learnedCount, topicProgress } from '../domain/stats'
+import { buildExplain, nextReviewDate, progressCounts } from '../domain/progress'
+import { countDue } from '../domain/stats'
 import { targetPath } from '../domain/router'
 import { navigate } from '../router'
 import { useAppState, useStore } from '../store/context'
@@ -50,8 +51,9 @@ export function Result() {
   const { progress, today } = state
   const { stats, target, stopped } = result
   const streak = store.streak(state)
-  const learned = learnedCount(catalog, progress)
-  const total = catalog.words.length
+  const all = progressCounts(catalog.words, progress)
+  const learned = all.learned
+  const total = all.total
   const celebrated = result.celebratedTopicIds
     .map((id) => catalog.topics.find((t) => t.id === id))
     .filter((t) => t !== undefined)
@@ -79,7 +81,7 @@ export function Result() {
           </h1>
           <div>
             {celebrated.map((t) => {
-              const p = topicProgress(catalog, t.id, progress)
+              const p = progressCounts(catalog.topicWords(t.id), progress)
               return (
                 <p className="muted" key={t.id}>
                   {t.title_ru}: выучено {p.learned} из {p.total}
@@ -128,6 +130,29 @@ export function Result() {
   const isReview = target.type === 'review'
   const dueLeft = countDue(catalog, progress, today)
   const day = state.days[today]
+  const targetWordsList =
+    target.type === 'topic'
+      ? catalog.topicWords(target.topicId)
+      : target.type === 'set'
+        ? catalog.setWords(target.setId)
+        : []
+  const targetTitle =
+    target.type === 'topic'
+      ? (catalog.topics.find((t) => t.id === target.topicId)?.title_ru ?? '')
+      : target.type === 'set'
+        ? (state.userSets.find((u) => u.id === target.setId)?.title ?? '')
+        : ''
+  const explain = buildExplain({
+    isReview,
+    newCount: result.newWords.count,
+    newKnow: result.newWords.know,
+    dueLeft,
+    nextDate: nextReviewDate(catalog.words, progress),
+    today,
+    remainingNew: progressCounts(targetWordsList, progress).notStarted,
+    targetKind: target.type === 'set' ? 'set' : 'topic',
+    targetTitle,
+  })
   const more = !isReview && canLearnMore(target, { catalog, progress, today, day })
 
   function repeatMore() {
@@ -149,6 +174,26 @@ export function Result() {
       <Tiles {...stats} />
       {streak > 0 && stats.passed > 0 && <p>{streakLine}</p>}
       {isReview && dueLeft > 0 && <p className="muted">Осталось повторить: {dueLeft}</p>}
+      {(explain.lead || explain.next.length > 0) && (
+        <div className="explain">
+          {explain.lead && (
+            <div>
+              <p className="lead">
+                <i className="sw-i" aria-hidden="true" />
+                {explain.lead.title}
+              </p>
+              <p>{explain.lead.detail}</p>
+            </div>
+          )}
+          {explain.next.length > 0 && (
+            <div className={`next${explain.lead ? '' : ' is-solo'}`}>
+              {explain.next.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <div className="actions">
         {isReview ? (
           dueLeft > 0 && stats.passed > 0 ? (

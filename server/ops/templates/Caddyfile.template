@@ -1,0 +1,18 @@
+# Шаблон Caddyfile. __HOST__ подставляет 60-https-check.sh,
+# например 203-0-113-10.sslip.io (IP через дефисы + .sslip.io).
+# Сертификат Let's Encrypt Caddy получает и продлевает сам.
+# Если Let's Encrypt недоступен или лимит исчерпан, можно позже добавить ZeroSSL
+# (блок global options { acme_ca ... }) - решаем, когда понадобится.
+#
+# ВРЕМЕННАЯ ЗАГЛУШКА: только /health. Когда появится API, строку `respond`
+# заменить на `reverse_proxy api:3000` (адрес и порт уточнит программист).
+__HOST__ {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+	}
+	respond /health "ok" 200
+	respond "not found" 404
+}

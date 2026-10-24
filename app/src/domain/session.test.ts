@@ -5,11 +5,30 @@ import {
   createSession,
   dropMissing,
   feedbackText,
+  sessionNewWords,
   sessionProgress,
   sessionStats,
 } from './session'
 
 const TODAY = '2026-10-19'
+
+describe('новые слова сессии (критерий 154)', () => {
+  it('считаются только слова без состояния; повторы и «again» не входят', () => {
+    let progress = progressMap(prog('a-03', 2, TODAY))
+    let s = createSession([
+      { wordId: 'a-01', kind: 'new' },
+      { wordId: 'a-02', kind: 'new' },
+      { wordId: 'a-03', kind: 'review' },
+    ])
+    for (const verdict of ['know', 'dont', 'know', 'know'] as const) {
+      const out = answer(s, verdict, { progress, today: TODAY, now: 1 })
+      if (out.update) progress = { ...progress, [out.update.progress.wordId]: out.update.progress }
+      s = out.session
+    }
+    expect(sessionNewWords(s)).toEqual({ count: 2, know: 1 })
+    expect(progress['a-02'].box).toBe(1)
+  })
+})
 
 describe('итоги сессии (критерий 21)', () => {
   it('«Пройдено / Знаю / Не знаю» считают слова, а не показы', () => {

@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { content } from '../data/content'
 import { toDateKey } from '../domain/dates'
 import type { SessionTarget } from '../domain/queue'
-import { dropMissing, isFinished, sessionStats, type Verdict } from '../domain/session'
+import {
+  dropMissing,
+  isFinished,
+  sessionNewWords,
+  sessionStats,
+  type Verdict,
+} from '../domain/session'
 import { countDue, learnedCount } from '../domain/stats'
 import type { SaveFile } from '../platform/saveFile'
 import { MemoryRepository } from '../storage/memoryRepository'
@@ -38,7 +44,7 @@ function play(
   while (!isFinished(session)) {
     session = store.answerCurrent(session, verdict(session.queue[0].wordId)).session
   }
-  store.finishSession(target, sessionStats(session), false, streakBefore)
+  store.finishSession(target, sessionStats(session), sessionNewWords(session), false, streakBefore)
   return session
 }
 
@@ -335,6 +341,7 @@ describe('«Тема выучена» (критерии 124–135, 138)', () => 
     second.store.finishSession(
       { type: 'topic', topicId: 'numbers' },
       { passed: 0, know: 0, dont: 0 },
+      { count: 0, know: 0 },
       true,
       0,
     )
@@ -354,7 +361,7 @@ describe('«Тема выучена» (критерии 124–135, 138)', () => 
     const other = session.queue.find((i) => i.wordId === ids[1])!
     session = { ...session, queue: [other] }
     store.answerCurrent(session, 'dont')
-    store.finishSession(target, { passed: 2, know: 1, dont: 1 }, false, 0)
+    store.finishSession(target, { passed: 2, know: 1, dont: 1 }, { count: 0, know: 0 }, false, 0)
     expect(store.getState().lastResult?.celebratedTopicIds).toEqual([])
     expect(store.getState().celebrations.shop).toBeUndefined()
   })

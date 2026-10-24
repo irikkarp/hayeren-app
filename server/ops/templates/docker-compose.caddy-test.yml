@@ -1,0 +1,22 @@
+# ВРЕМЕННЫЙ файл только для проверки HTTPS (60-https-check.sh).
+# Содержит один сервис caddy. Будет заменён полным docker-compose.yml (caddy + api)
+# после появления кода бэкенда. Версия образа закреплена на мажорной ветке 2.
+services:
+  caddy:
+    image: caddy:2
+    container_name: hayeren-caddy-test
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data     # здесь хранятся сертификаты, том не удалять
+      - caddy_config:/config
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+volumes:
+  caddy_data:
+  caddy_config:

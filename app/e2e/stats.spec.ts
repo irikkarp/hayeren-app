@@ -157,9 +157,12 @@ test.describe('Повторить (N) (110–123)', () => {
     await expect(page).toHaveURL(/#\/$/)
   })
 
-  test('N = 0 при наличии прогресса: «На сегодня всё повторено»', async ({ page }) => {
+  test('N = 0 при наличии прогресса: дата ближайшего повторения вместо «На сегодня всё повторено» (113, 159)', async ({
+    page,
+  }) => {
     await openWith(page, { progress: [{ wordId: 'shop-01', box: 2, dueDate: addDays(TODAY, 2) }] })
-    await expect(page.getByText('На сегодня всё повторено')).toBeVisible()
+    await expect(page.getByText('На сегодня всё повторено')).toHaveCount(0)
+    await expect(page.locator('#review-note')).toHaveText('Следующее повторение — послезавтра')
     await expect(page.getByRole('button', { name: 'Повторить (0)' })).toBeDisabled()
   })
 
