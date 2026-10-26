@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# 40-swap-and-updates.sh - swap-файл (1 ГБ) и автоматические обновления безопасности.
+# 40-swap-and-updates.sh - проверка swap и автообновлений. Ничего не перезагружает.
+# На сервере с VPN swap (/swapfile) и unattended-upgrades обычно уже есть:
+# тогда скрипт только сообщает об этом и ничего не меняет.
+# Автоперезагрузку НЕ включаем: перезагрузка сервера уронит VPN.
 # Запуск: sudo bash 40-swap-and-updates.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
@@ -11,50 +14,40 @@ SWAP_SIZE_MB=1024
 
 # --- swap ---
 if [ -n "$(swapon --show --noheadings 2>/dev/null)" ]; then
-  skip "Swap уже настроен:"
+  skip "Swap уже настроен, не трогаю:"
   swapon --show
 else
   FREE_MB="$(df -Pm / | awk 'NR==2{print $4}')"
   [ "$FREE_MB" -gt $((SWAP_SIZE_MB + 2048)) ] || die "Мало свободного места на диске (${FREE_MB} МБ)."
-  info "Создаю swap-файл ${SWAP_SIZE_MB} МБ (на 1 ГБ RAM он страхует от нехватки памяти)."
+  info "Swap нет. Создаю swap-файл ${SWAP_SIZE_MB} МБ."
   confirm "Создать?" || exit 0
   fallocate -l "${SWAP_SIZE_MB}M" "$SWAP_FILE" 2>/dev/null \
     || dd if=/dev/zero of="$SWAP_FILE" bs=1M count="$SWAP_SIZE_MB" status=none
   chmod 600 "$SWAP_FILE"
   mkswap "$SWAP_FILE" >/dev/null
   swapon "$SWAP_FILE"
-  ok "Swap включён."
+  grep -qE "^$SWAP_FILE\s" /etc/fstab || echo "$SWAP_FILE none swap sw 0 0" >> /etc/fstab
+  ok "Swap включён и добавлен в /etc/fstab."
 fi
-if ! grep -qE "^$SWAP_FILE\s" /etc/fstab && [ -f "$SWAP_FILE" ]; then
-  echo "$SWAP_FILE none swap sw 0 0" >> /etc/fstab
-  ok "Swap добавлен в /etc/fstab (переживёт перезагрузку)."
-else
-  skip "Запись в /etc/fstab уже есть или swap не наш."
-fi
-# Редко пользоваться swap'ом - только когда памяти почти не осталось.
-SYSCTL="/etc/sysctl.d/99-hayeren.conf"
-if [ ! -f "$SYSCTL" ]; then
-  echo "vm.swappiness=10" > "$SYSCTL"
-  sysctl -q -p "$SYSCTL"
-  ok "vm.swappiness=10."
-else
-  skip "$SYSCTL уже есть."
-fi
+free -m
 
 # --- автообновления безопасности ---
-DEBIAN_FRONTEND=noninteractive apt-get install -y -qq unattended-upgrades
-AUTO="/etc/apt/apt.conf.d/20auto-upgrades"
-if grep -q 'Unattended-Upgrade "1"' "$AUTO" 2>/dev/null; then
-  skip "Автообновления уже включены."
+if systemctl is-enabled --quiet unattended-upgrades 2>/dev/null \
+   && grep -qs 'Unattended-Upgrade "1"' /etc/apt/apt.conf.d/20auto-upgrades; then
+  skip "unattended-upgrades уже активен, не трогаю."
 else
-  cat > "$AUTO" <<'CONF'
+  warn "unattended-upgrades не настроен полностью."
+  confirm "Установить и включить автообновления безопасности (без автоперезагрузки)?" || exit 0
+  DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y -qq unattended-upgrades
+  cat > /etc/apt/apt.conf.d/20auto-upgrades <<'CONF'
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
 CONF
-  ok "Автообновления безопасности включены."
+  ok "Автообновления включены."
 fi
-# Автоперезагрузку НЕ включаем: это решение владельца (сервер перезапустится сам в 04:00).
 if [ -f /var/run/reboot-required ]; then
-  warn "Системе нужна перезагрузка (/var/run/reboot-required). Сделайте её вручную в удобное время: sudo reboot"
+  warn "Системе нужна перезагрузка (/var/run/reboot-required). НЕ перезагружайте сейчас: VPN упадёт. Выберите удобное время и предупредите пользователей VPN."
 fi
-systemctl is-enabled unattended-upgrades || true
+if grep -rqs '^Unattended-Upgrade::Automatic-Reboot "true"' /etc/apt/apt.conf.d/; then
+  warn "Включена автоперезагрузка (Automatic-Reboot). Она уронит VPN. Мы её не меняем; решение за владельцем."
+fi

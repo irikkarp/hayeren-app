@@ -1,23 +1,15 @@
 #!/usr/bin/env bash
-# 10-user-and-ssh.sh - пользователь deploy и безопасный вход по SSH-ключу.
-#
-# Работает в ДВА этапа, чтобы вы не потеряли доступ к серверу:
+# 10-user-and-ssh.sh - пользователь deploy с SSH-ключом (для деплоев Hayeren).
 #
 #   sudo bash 10-user-and-ssh.sh prepare
 #       Создаёт пользователя deploy, кладёт ваш ПУБЛИЧНЫЙ ключ, задаёт пароль
-#       deploy (он нужен только для sudo, по SSH пароли будут запрещены).
-#       Вход по паролю и root ПОКА НЕ отключаются.
+#       deploy (нужен только для sudo).
 #
-#   >>> Теперь откройте ВТОРОЕ окно Терминала и проверьте вход:
-#       ssh -i ~/.ssh/hayeren_vultr deploy@IP
-#       Старое окно с root НЕ закрывайте. <<<
-#
-#   sudo bash 10-user-and-ssh.sh harden
-#       Только после успешного входа ключом: запрещает пароли и вход root.
-#       Скрипт проверяет по журналу, что вход deploy по ключу уже был.
-#
-#   sudo bash 10-user-and-ssh.sh rollback
-#       Отменяет harden (удаляет наш файл настроек и перезагружает SSH).
+# ВАЖНО: на этом сервере работает VPN, которым управляет приложение Amnezia
+# через SSH под root по паролю/ключу. Поэтому скрипт НЕ меняет настройки sshd:
+# вход root и вход по паролю остаются как были. Режим «harden» (запрет root и
+# паролей) удалён намеренно. Как безопасно отключить пароли позже - см.
+# docs/devops/003-server-setup.md, раздел «Необязательно: перевод Amnezia на ключ».
 #
 # Скрипт идемпотентен: повторный запуск ничего не ломает.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,14 +17,8 @@ source "$SCRIPT_DIR/lib.sh"
 need_root "$@"
 check_os
 
-DROPIN="/etc/ssh/sshd_config.d/00-hayeren.conf"
 HOME_DIR="/home/$DEPLOY_USER"
 AUTH_KEYS="$HOME_DIR/.ssh/authorized_keys"
-
-reload_ssh() {
-  # На Ubuntu служба называется ssh (не sshd).
-  systemctl reload ssh 2>/dev/null || systemctl restart ssh
-}
 
 prepare() {
   # 1. Пользователь
@@ -96,78 +82,15 @@ prepare() {
 next_hint() {
   cat <<MSG
 
-СЛЕДУЮЩИЙ ШАГ (старое окно не закрывайте!):
+СЛЕДУЮЩИЙ ШАГ (текущее окно не закрывайте):
   Откройте новое окно Терминала на Mac и выполните
       ssh -i ~/.ssh/hayeren_vultr ${DEPLOY_USER}@<IP-сервера>
-  Если зашли без запроса пароля сервера (запрос парольной фразы ключа - нормально),
-  вернитесь сюда и запустите:  sudo bash $0 harden
+  Должен запросить парольную фразу ключа (не пароль сервера) и пустить вас.
+  Настройки SSH этим скриптом не менялись, приложение Amnezia работает как раньше.
 MSG
-}
-
-key_login_seen() {
-  # Ищем в журнале успешный вход deploy именно по ключу.
-  { journalctl -u ssh --no-pager 2>/dev/null; cat /var/log/auth.log 2>/dev/null; } \
-    | grep -q "Accepted publickey for $DEPLOY_USER "
-}
-
-harden() {
-  [ -s "$AUTH_KEYS" ] || die "У $DEPLOY_USER нет ключей. Сначала: bash $0 prepare"
-  if [ -f "$DROPIN" ]; then
-    skip "Защита уже включена ($DROPIN)."
-    return
-  fi
-  if key_login_seen; then
-    ok "В журнале найден успешный вход $DEPLOY_USER по ключу."
-  else
-    warn "В журнале НЕТ входа $DEPLOY_USER по ключу. Если отключить пароли сейчас, можно потерять доступ."
-    warn "Сначала проверьте вход из второго окна (см. подсказку выше)."
-    confirm "Я понимаю риск и всё равно хочу продолжить (не рекомендуется)?" || exit 1
-  fi
-  warn "После этого шага: вход root и вход по паролю по SSH станут невозможны."
-  warn "Текущее окно НЕ закрывайте до проверки нового входа."
-  confirm "Включить защиту SSH?" || exit 0
-
-  # Файл с префиксом 00- читается первым; в sshd побеждает ПЕРВОЕ значение,
-  # поэтому он перекрывает настройки облачного образа (50-cloud-init.conf).
-  cat > "$DROPIN" <<CONF
-# Создано server/ops/10-user-and-ssh.sh. Откат: bash 10-user-and-ssh.sh rollback
-PermitRootLogin no
-PasswordAuthentication no
-KbdInteractiveAuthentication no
-PubkeyAuthentication yes
-CONF
-  chmod 644 "$DROPIN"
-
-  # Проверка синтаксиса ДО применения: при ошибке откатываем файл.
-  if ! sshd -t; then
-    rm -f "$DROPIN"
-    die "Конфигурация SSH некорректна, файл удалён, ничего не изменено."
-  fi
-  reload_ssh
-  ok "Защита включена."
-  sshd -T | grep -E '^(permitrootlogin|passwordauthentication) '
-  cat <<MSG
-
-ОБЯЗАТЕЛЬНО СЕЙЧАС: в ТРЕТЬЕМ окне снова проверьте
-    ssh -i ~/.ssh/hayeren_vultr ${DEPLOY_USER}@<IP-сервера>
-Если не получилось - в этом (ещё открытом) окне выполните:
-    bash $0 rollback
-MSG
-}
-
-rollback() {
-  if [ -f "$DROPIN" ]; then
-    rm -f "$DROPIN"
-    sshd -t && reload_ssh
-    ok "Защита SSH отключена (пароли и root снова разрешены, если так настроено у провайдера)."
-  else
-    skip "Файла $DROPIN нет, откатывать нечего."
-  fi
 }
 
 case "${1:-}" in
   prepare)  prepare ;;
-  harden)   harden ;;
-  rollback) rollback ;;
-  *) echo "Использование: sudo bash $0 {prepare|harden|rollback}"; exit 1 ;;
+  *) echo "Использование: sudo bash $0 prepare"; exit 1 ;;
 esac

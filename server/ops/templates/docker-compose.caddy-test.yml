@@ -6,6 +6,12 @@ services:
     image: caddy:2
     container_name: hayeren-caddy-test
     restart: unless-stopped
+    # Сервер на 950 МБ RAM делится с VPN: жёсткий потолок, чтобы Caddy не вытеснил VPN.
+    mem_limit: 128m
+    memswap_limit: 192m
+    cpus: 0.5
+    environment:
+      GOMEMLIMIT: 100MiB
     ports:
       - "80:80"
       - "443:443"

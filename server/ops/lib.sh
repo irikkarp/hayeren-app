@@ -33,14 +33,43 @@ confirm() {
   esac
 }
 
-# Скрипты рассчитаны на Ubuntu 24.04. На другой системе просим подтверждения.
+# Скрипты рассчитаны на Ubuntu 24.04 и 26.04 LTS (на них спрашивать не будем).
+# На другой системе просим подтверждения.
 check_os() {
   if [ -r /etc/os-release ]; then
     # shellcheck disable=SC1091
     . /etc/os-release
-    if [ "${ID:-}" != "ubuntu" ] || [ "${VERSION_ID:-}" != "24.04" ]; then
-      warn "Система: ${PRETTY_NAME:-неизвестно}. Скрипты проверялись на Ubuntu 24.04."
-      confirm "Всё равно продолжить?" || exit 1
+    if [ "${ID:-}" = "ubuntu" ] && { [ "${VERSION_ID:-}" = "24.04" ] || [ "${VERSION_ID:-}" = "26.04" ]; }; then
+      return 0
     fi
+    warn "Система: ${PRETTY_NAME:-неизвестно}. Скрипты проверялись на Ubuntu 24.04 и 26.04."
+    confirm "Всё равно продолжить?" || exit 1
+  fi
+}
+
+# --- Защита работающего VPN (контейнер Amnezia) ---
+# vpn_snapshot печатает «имя время-старта число-перезапусков» для контейнеров
+# с amnezia/awg/wireguard/openvpn в имени. Только читает, ничего не меняет.
+vpn_snapshot() {
+  command -v docker >/dev/null 2>&1 || return 0
+  local names n
+  names="$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -Ei 'amnezia|awg|wireguard|openvpn|xray' || true)"
+  for n in $names; do
+    docker inspect -f '{{.Name}} {{.State.Status}} started={{.State.StartedAt}} restarts={{.RestartCount}}' "$n" 2>/dev/null || true
+  done
+}
+
+# Использование: VPN_BEFORE="$(vpn_snapshot)" ... vpn_compare "$VPN_BEFORE"
+vpn_compare() {
+  local before="$1" after
+  after="$(vpn_snapshot)"
+  if [ "$before" = "$after" ]; then
+    ok "VPN-контейнер не перезапускался (время старта не изменилось)."
+  else
+    warn "СОСТОЯНИЕ VPN-КОНТЕЙНЕРА ИЗМЕНИЛОСЬ! Было:"
+    echo "$before"
+    warn "Стало:"
+    echo "$after"
+    warn "Проверьте VPN в приложении Amnezia и сообщите контролёру."
   fi
 }

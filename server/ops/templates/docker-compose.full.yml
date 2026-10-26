@@ -1,0 +1,47 @@
+# ЗАГОТОВКА полного compose (caddy + api) для будущего бэкенда. Пока НЕ используется:
+# сейчас работает docker-compose.caddy-test.yml. Образ api и порт уточнит программист.
+# Сервер (950 МБ RAM) делится с VPN, поэтому у каждого сервиса жёсткий потолок памяти.
+# Ротация логов задаётся здесь, а не в daemon.json (демон Docker не перезапускаем).
+# Бюджет: caddy 128m + api 256m = 384 МБ максимум, остальное остаётся VPN и системе.
+services:
+  caddy:
+    image: caddy:2
+    container_name: hayeren-caddy
+    restart: unless-stopped
+    mem_limit: 128m
+    memswap_limit: 192m
+    cpus: 0.5
+    environment:
+      GOMEMLIMIT: 100MiB
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [api]
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+  api:
+    image: hayeren-api:latest   # заменит программист
+    container_name: hayeren-api
+    restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 384m
+    cpus: 0.5
+    env_file: /opt/hayeren/.env
+    environment:
+      NODE_OPTIONS: --max-old-space-size=192
+    expose:
+      - "3000"                  # только внутри сети compose, наружу НЕ публикуем
+    volumes:
+      - /opt/hayeren/data:/data
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+volumes:
+  caddy_data:
+  caddy_config:

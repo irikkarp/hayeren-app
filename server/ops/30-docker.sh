@@ -1,55 +1,42 @@
 #!/usr/bin/env bash
-# 30-docker.sh - Docker Engine и Compose из официального репозитория Docker.
+# 30-docker.sh - проверка Docker и плагина Compose. Docker на сервере уже стоит
+# (пакеты Ubuntu) и обслуживает VPN-контейнер Amnezia.
+#
+# НЕ переустанавливаем Docker, НЕ меняем /etc/docker/daemon.json и НИКОГДА не
+# перезапускаем демон: перезапуск остановит VPN-контейнер.
+# Ротация логов задаётся в compose-файлах на уровне сервиса.
+#
 # Запуск: sudo bash 30-docker.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 need_root "$@"
 check_os
 
-# Если на сервере уже работает что-то на 80/443, ставить наш Caddy нельзя без решения владельца.
-if ss -tln 2>/dev/null | grep -qE ':(80|443)\s'; then
-  warn "Порты 80/443 уже заняты:"
-  ss -tlnp | grep -E ':(80|443)\s' || true
-  confirm "Продолжить установку Docker (наш Caddy потом может не запуститься)?" || exit 1
-fi
+command -v docker >/dev/null || die "Docker не найден. Ожидалось, что он уже стоит (проверьте 00-check.sh). Ничего не ставлю."
+docker --version
+VPN_BEFORE="$(vpn_snapshot)"
+info "VPN до изменений:"; echo "${VPN_BEFORE:-  (контейнеры VPN не найдены)}"
 
-if command -v docker >/dev/null && docker compose version >/dev/null 2>&1; then
-  skip "Docker и Compose уже установлены: $(docker --version)"
+if docker compose version >/dev/null 2>&1; then
+  skip "Плагин compose уже есть: $(docker compose version)"
 else
-  info "Подключаю репозиторий Docker и устанавливаю пакеты (нужен интернет)."
-  confirm "Продолжить?" || exit 0
+  info "Плагина compose нет. Ставлю только пакет docker-compose-v2 (без трогания демона)."
+  # needrestart в режиме «только список»: не перезапускает службы после apt.
+  export DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l NEEDRESTART_SUSPEND=1
   apt-get update -qq
-  DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ca-certificates curl
-  install -m 0755 -d /etc/apt/keyrings
-  if [ ! -s /etc/apt/keyrings/docker.asc ]; then
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    chmod a+r /etc/apt/keyrings/docker.asc
+  # Сначала симуляция: если apt собирается ставить/обновлять docker.io, containerd,
+  # runc (их обновление перезапускает демон), останавливаемся.
+  PLAN="$(apt-get install -s --no-upgrade docker-compose-v2 2>&1)" \
+    || die "Пакет docker-compose-v2 недоступен (проверить на 26.04). Пришлите вывод в чат, ничего не изменено."
+  echo "$PLAN" | grep -E '^(Inst|Remv) ' || true
+  if echo "$PLAN" | grep -E '^(Inst|Remv) (docker|containerd|runc)' | grep -vE '^Inst docker-compose-v2 '; then
+    die "apt хочет изменить пакеты Docker/containerd/runc. Это может перезапустить VPN. Остановлено, пришлите вывод в чат."
   fi
-  # shellcheck disable=SC1091
-  CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")"
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $CODENAME stable" \
-    > /etc/apt/sources.list.d/docker.list
-  apt-get update -qq
-  DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-    docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-  ok "Docker установлен."
+  confirm "Установить только docker-compose-v2?" || exit 0
+  apt-get install -y -qq --no-upgrade docker-compose-v2
+  docker compose version || die "После установки 'docker compose' не работает (проверить на 26.04)."
+  ok "Плагин compose установлен. Демон Docker не перезапускался."
 fi
-
-# Ротация логов контейнеров, чтобы они не съели диск.
-DAEMON_JSON="/etc/docker/daemon.json"
-if [ -f "$DAEMON_JSON" ]; then
-  skip "$DAEMON_JSON уже существует, не трогаю."
-else
-  cat > "$DAEMON_JSON" <<'CONF'
-{
-  "log-driver": "json-file",
-  "log-opts": { "max-size": "10m", "max-file": "5" }
-}
-CONF
-  systemctl restart docker
-  ok "Ротация логов Docker настроена."
-fi
-systemctl enable --now docker >/dev/null 2>&1
 
 # Группа docker фактически равна root-доступу, поэтому спрашиваем.
 if id "$DEPLOY_USER" >/dev/null 2>&1; then
@@ -66,5 +53,4 @@ else
   warn "Пользователя $DEPLOY_USER нет. Сначала выполните 10-user-and-ssh.sh."
 fi
 
-docker --version
-docker compose version
+vpn_compare "$VPN_BEFORE"

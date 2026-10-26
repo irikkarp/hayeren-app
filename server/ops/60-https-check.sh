@@ -4,6 +4,8 @@
 # и сам получает сертификат Let's Encrypt. Кода бэкенда здесь нет.
 #
 # Требует: 20-firewall.sh (порты 80/443 открыты), 30-docker.sh, 50-app-dirs.sh.
+# Запускается ТОЛЬКО контейнер Caddy (docker compose up -d). Остальные
+# контейнеры, в том числе VPN, и демон Docker не затрагиваются.
 # Запуск: sudo bash 60-https-check.sh [up|down]   (по умолчанию up)
 #
 # ПОТОМ ЗАМЕНИТСЯ: когда появится бэкенд, в Caddyfile вместо строки
@@ -25,19 +27,26 @@ fi
 command -v docker >/dev/null || die "Нет Docker (30-docker.sh)."
 [ -d "$CADDY_DIR" ] || die "Нет $CADDY_DIR (50-app-dirs.sh)."
 
-# Определяем публичный IPv4 и просим подтвердить.
-IP="$(curl -4 -fsS --max-time 10 https://api.ipify.org 2>/dev/null || true)"
-read -r -p "Публичный IPv4 сервера [${IP:-введите вручную}]: " typed
-IP="${typed:-$IP}"
-[[ "$IP" =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] || die "Некорректный IPv4: '$IP'"
-HOST="${IP//./-}.sslip.io"
+# Адрес сервера. По умолчанию - адрес нашего сервера; можно ввести другой.
+DEFAULT_HOST="208-85-20-164.sslip.io"
+read -r -p "Адрес для HTTPS [$DEFAULT_HOST]: " typed
+HOST="${typed:-$DEFAULT_HOST}"
+[[ "$HOST" =~ ^[0-9]{1,3}(-[0-9]{1,3}){3}\.sslip\.io$ ]] || die "Ожидался адрес вида 208-85-20-164.sslip.io, получено: '$HOST'"
 info "Адрес для проверки: https://$HOST/health"
 
-# Если наш тестовый Caddy уже запущен - порты заняты им, это нормально.
-if [ -z "$(docker ps -q --filter name=hayeren-caddy-test)" ] && ss -tln | grep -qE ':(80|443)\s'; then
-  warn "Порты 80/443 заняты чем-то другим:"
-  ss -tlnp | grep -E ':(80|443)\s' || true
-  confirm "Всё равно попробовать?" || exit 1
+# --- Защита VPN ---
+# Caddy публикует 80/tcp, 443/tcp, 443/udp. VPN Amnezia работает на своём
+# UDP/TCP-порту. Если один из наших портов уже занят (в т.ч. самим VPN), стоп.
+VPN_BEFORE="$(vpn_snapshot)"
+info "VPN до запуска:"; echo "${VPN_BEFORE:-  (контейнеры VPN не найдены)}"
+if [ -z "$(docker ps -q --filter name=hayeren-caddy-test)" ]; then
+  BUSY="$(ss -H -tuln 2>/dev/null | awk '{print $1" "$5}' | grep -E '(tcp .*:(80|443)$|udp .*:443$)' || true)"
+  PUBLISHED="$(docker ps --format '{{.Names}}: {{.Ports}}' | grep -E ':(80|443)->' || true)"
+  if [ -n "$BUSY$PUBLISHED" ]; then
+    warn "Порты 80/443 уже заняты, запуск Caddy может задеть то, что на них работает (возможно, VPN):"
+    echo "$BUSY"; echo "$PUBLISHED"
+    die "Остановлено. Пришлите этот вывод в чат."
+  fi
 fi
 
 warn "Caddy запросит сертификат у Let's Encrypt. Частые перезапуски упираются в лимиты выпуска."
@@ -48,6 +57,7 @@ cp "$SCRIPT_DIR/templates/docker-compose.caddy-test.yml" "$COMPOSE"
 chown "$DEPLOY_USER:$DEPLOY_USER" "$CADDY_DIR/Caddyfile" "$COMPOSE"
 
 docker compose -f "$COMPOSE" up -d
+vpn_compare "$VPN_BEFORE"
 info "Жду выпуска сертификата (до 60 секунд)..."
 for _ in $(seq 1 12); do
   sleep 5
